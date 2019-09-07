@@ -1,4 +1,6 @@
 import * as firebase from 'firebase';
+import 'firebase/firestore';
+
 import {
   API_KEY,
   AUTH_DOMAIN,
@@ -9,7 +11,7 @@ import {
   APP_ID
 } from 'react-native-dotenv'
 
-export const firebaseConfig = {
+const firebaseConfig = {
   apiKey: API_KEY,
   authDomain: AUTH_DOMAIN,
   databaseURL: DATABASE_URL,
@@ -20,6 +22,10 @@ export const firebaseConfig = {
 };
 
 // Initialize Firebase
-const Firebase = firebase.initializeApp(firebaseConfig)
+firebase.initializeApp(firebaseConfig)
 
-export default Firebase
+export const database = firebase.database();
+export const auth = firebase.auth();
+export const firestore = firebase.firestore();
+export const storage = firebase.storage();
+export const serverTimestamp = () => {firebase.firestore.FieldValue.serverTimestamp();};
