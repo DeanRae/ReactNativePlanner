@@ -2,7 +2,7 @@ import { firestore, serverTimestamp } from "../../services/firebase";
 import * as types from './actionTypes';
 
 export const getAllTasks = () => (dispatch, getState) => {
-    dispatch(loading);
+    dispatch(loading());
 
     const { user } = getState();
     let tasks = {};
@@ -41,7 +41,7 @@ export const getAllTasks = () => (dispatch, getState) => {
 }
 
 export const addTask = (task) => (dispatch, getState) => {
-    dispatch(loading);
+    dispatch(loading());
 
     const { user } = getState();
     let newTask = {};
@@ -60,7 +60,7 @@ export const addTask = (task) => (dispatch, getState) => {
 }
 
 export const editTask = (taskId, editedContents) => (dispatch, getState) => {
-    dispatch(loading);
+    dispatch(loading());
 
     const { user } = getState();
     let editedTask = {};
@@ -81,15 +81,50 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
         });
 }
 
+export const deleteTask = (taskId) => (dispatch, getState) => {
+    dispatch(loading());
+
+    const { user } = getState();
+
+    firestore
+        .collection(`/userProfile/${user.uid}/tasks`)
+        .doc(taskId)
+        .delete()
+        .then(() => {
+            dispatch(taskDeleted(taskId));
+        })
+        .catch( error => {
+            console.log("error ", error.message);
+            dispatch(taskOperationError(error.message));
+        });
+}
+
+export const errorDisplayed = () => dispatch => {
+    dispatch(errorAcknowledged());
+}
+
 
 
 const taskOperationSuccess = tasks => ({
     type: types.TASK_OPERATION_SUCCESS,
     tasks
-})
+});
+
+const taskDeleted = taskId => ({
+    type: types.TASK_DELETION_SUCCESS,
+    taskId
+});
 
 const taskOperationError = error => ({
     type: types.TASK_OPERATION_ERROR,
     error
+});
+
+const loading = () => ({
+    type: types.LOADING
+});
+
+const errorAcknowledged = () => ({
+    type: types.ERROR_ACKNOWLEDGED
 });
 
