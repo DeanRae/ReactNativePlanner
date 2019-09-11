@@ -5,7 +5,10 @@ export const getAllTasks = () => (dispatch, getState) => {
     dispatch(loading());
 
     const { user } = getState();
-    let tasks = {};
+    let tasks = {
+        byId: {},
+        allIds: []
+    };
 
     firestore
         .collection(`/userProfile/${user.uid}/tasks`)
@@ -14,7 +17,7 @@ export const getAllTasks = () => (dispatch, getState) => {
             if (!allTasks.empty()) {
                 allTasks.forEach(task => {
                     let taskData = task.data();
-                    tasks[taskData.id] = {
+                    tasks.byId[taskData.id] = {
                         id: taskData.id,
                         title: taskData.title,
                         description: taskData.description,
@@ -27,11 +30,13 @@ export const getAllTasks = () => (dispatch, getState) => {
                         isCompleted: taskData.isCompleted,
                         createdTimestamp: taskData.createdTimestamp,
                         updatedTimestamp: taskData.updatedTimestamp
-                    }
+                    };
+
+                    tasks.allIds.push(taskData.id);
                 });
             }
 
-            dispatch(taskOperationSuccess(tasks));
+            dispatch(tasksFetched(tasks));
 
         })
         .catch( error => {
@@ -48,10 +53,10 @@ export const addTask = (task) => (dispatch, getState) => {
 
     firestore
         .collection(`/userProfile/${user.uid}/tasks`)
-        .add(task)
+        .add(...task)
         .then(docRef => {
-            newTask[docRef.id] = {...task, id: docRef.id};
-            dispatch(taskOperationSuccess(newTask));
+            newTask = {...task, id: docRef.id};
+            dispatch(taskAdded(newTask));
         })
         .catch( error => {
             console.log("error ", error.message);
@@ -69,11 +74,11 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
         .collection(`/userProfile/${user.uid}/tasks`)
         .doc(taskId)
         .update({
-            editedContents
+            ...editedContents
         })
         .then(() => {
-            editedTask[taskId] = {...editedContents};
-            dispatch(taskOperationSuccess(editedTask));
+            editedTask = {...editedContents};
+            dispatch(taskModified(editedTask));
         })
         .catch( error => {
             console.log("error ", error.message);
@@ -105,10 +110,20 @@ export const errorDisplayed = () => dispatch => {
 
 
 
-const taskOperationSuccess = tasks => ({
-    type: types.TASK_OPERATION_SUCCESS,
+const tasksFetched = tasks => ({
+    type: types.TASK_FETCHED,
     tasks
 });
+
+const taskModified = task => ({
+    type: types.TASK_MODIFIED,
+    task
+});
+
+const taskAdded = task => ({
+    type: types.TASK_ADDED,
+    task
+})
 
 const taskDeleted = taskId => ({
     type: types.TASK_DELETION_SUCCESS,
