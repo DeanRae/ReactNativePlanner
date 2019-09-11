@@ -59,6 +59,28 @@ export const addTask = (task) => (dispatch, getState) => {
         });
 }
 
+export const editTask = (taskId, editedContents) => (dispatch, getState) => {
+    dispatch(loading);
+
+    const { user } = getState();
+    let editedTask = {};
+
+    firestore
+        .collection(`/userProfile/${user.uid}/tasks`)
+        .doc(taskId)
+        .update({
+            editedContents
+        })
+        .then(() => {
+            editedTask[taskId] = {...editedContents};
+            dispatch(taskOperationSuccess(editedTask));
+        })
+        .catch( error => {
+            console.log("error ", error.message);
+            dispatch(taskOperationError(error.message));
+        });
+}
+
 
 
 const taskOperationSuccess = tasks => ({
