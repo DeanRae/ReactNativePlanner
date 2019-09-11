@@ -40,6 +40,25 @@ export const getAllTasks = () => (dispatch, getState) => {
         });
 }
 
+export const addTask = (task) => (dispatch, getState) => {
+    dispatch(loading);
+
+    const { user } = getState();
+    let newTask = {};
+
+    firestore
+        .collection(`/userProfile/${user.uid}/tasks`)
+        .add(task)
+        .then(docRef => {
+            newTask[docRef.id] = {...task, id: docRef.id};
+            dispatch(taskOperationSuccess(newTask));
+        })
+        .catch( error => {
+            console.log("error ", error.message);
+            dispatch(taskOperationError(error.message));
+        });
+}
+
 
 
 const taskOperationSuccess = tasks => ({
