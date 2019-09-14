@@ -21,11 +21,50 @@ const firebaseConfig = {
   appId: APP_ID
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig)
 
-export const database = firebase.database();
-export const auth = firebase.auth();
-export const firestore = firebase.firestore();
-export const storage = firebase.storage();
-export const serverTimestamp = () => {firebase.firestore.FieldValue.serverTimestamp();};
+let HAS_INITIALIZED = false
+
+/**
+ * Initialize Firebase if uninitialized 
+ */
+const initFirebase = () => {
+  if (!HAS_INITIALIZED) {
+    firebase.initializeApp(firebaseConfig);
+    HAS_INITIALIZED = true;
+  }
+}
+
+export const database = () => {
+  initFirebase();
+  return firebase.database();
+}
+
+export const auth = () => {
+  initFirebase();
+  return firebase.auth();
+}
+
+export const firestore = () => {
+  initFirebase();
+  return firebase.firestore();
+}
+
+export const storage = () => {
+  initFirebase();
+  return firebase.storage();
+}
+
+export const serverTimestamp = () => {
+  initFirebase();
+  return firebase.firestore.FieldValue.serverTimestamp();
+}
+
+export const credential = (user,password) => {
+  initFirebase();
+  return firebase.auth.EmailAuthProvider.credential(
+    user.email,
+    password
+  );
+};
+
+
