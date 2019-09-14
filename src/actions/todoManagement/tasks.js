@@ -2,23 +2,26 @@ import { firestore, serverTimestamp } from "../../services/firebase";
 import * as types from './actionTypes';
 
 export const getAllTasks = () => (dispatch, getState) => {
-    dispatch(loading());
+    dispatch(taskOperationLoading());
 
-    const { user } = getState();
-    let tasks = {
+    const {auth} = getState();
+    const user = {...auth.user};
+    
+    console.log("in get all tasks ", user);
+    let newTasks = {
         byId: {},
         allIds: []
     };
 
-    firestore
+    firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
         .get()
         .then(allTasks => {
-            if (!allTasks.empty()) {
+            if (!allTasks.empty) {
                 allTasks.forEach(task => {
                     let taskData = task.data();
-                    tasks.byId[taskData.id] = {
-                        id: taskData.id,
+                    newTasks.byId[task.id] = {
+                        id: task.id,
                         title: taskData.title,
                         description: taskData.description,
                         location: taskData.location,
@@ -32,11 +35,11 @@ export const getAllTasks = () => (dispatch, getState) => {
                         updatedTimestamp: taskData.updatedTimestamp
                     };
 
-                    tasks.allIds.push(taskData.id);
+                    newTasks.allIds.push(task.id);
                 });
             }
 
-            dispatch(tasksFetched(tasks));
+            dispatch(tasksFetched(newTasks));
 
         })
         .catch( error => {
@@ -46,14 +49,16 @@ export const getAllTasks = () => (dispatch, getState) => {
 }
 
 export const addTask = (task) => (dispatch, getState) => {
-    dispatch(loading());
+    dispatch(taskOperationLoading());
 
-    const { user } = getState();
+    const {auth} = getState();
+    const user = {...auth.user};
+
     let newTask = {};
 
-    firestore
+    firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
-        .add(...task)
+        .add({...task})
         .then(docRef => {
             newTask = {...task, id: docRef.id};
             dispatch(taskAdded(newTask));
@@ -65,20 +70,19 @@ export const addTask = (task) => (dispatch, getState) => {
 }
 
 export const editTask = (taskId, editedContents) => (dispatch, getState) => {
-    dispatch(loading());
+    dispatch(taskOperationLoading());
 
-    const { user } = getState();
-    let editedTask = {};
+    const {auth} = getState();
+    const user = {...auth.user};
 
-    firestore
+    firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
         .doc(taskId)
         .update({
             ...editedContents
         })
         .then(() => {
-            editedTask = {...editedContents};
-            dispatch(taskModified(editedTask));
+            dispatch(taskModified({...editedContents}));
         })
         .catch( error => {
             console.log("error ", error.message);
@@ -87,11 +91,12 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
 }
 
 export const deleteTask = (taskId) => (dispatch, getState) => {
-    dispatch(loading());
+    dispatch(taskOperationLoading());
 
-    const { user } = getState();
+    const {auth} = getState();
+    const user = {...auth.user};
 
-    firestore
+    firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
         .doc(taskId)
         .delete()
@@ -109,9 +114,8 @@ export const errorDisplayed = () => dispatch => {
 }
 
 
-
 const tasksFetched = tasks => ({
-    type: types.TASK_FETCHED,
+    type: types.TASKS_FETCHED,
     tasks
 });
 
@@ -135,8 +139,8 @@ const taskOperationError = error => ({
     error
 });
 
-const loading = () => ({
-    type: types.LOADING
+const taskOperationLoading = () => ({
+    type: types.TASK_OPERATION_LOADING
 });
 
 const errorAcknowledged = () => ({
