@@ -8,13 +8,55 @@ class AuthForm extends Component {
     constructor(props) {
         super(props);
 
-        const { fields, error, buttonDetails } = props;
+        const { fields, buttonDetails } = props;
 
         this.state = {
-            ...fields,
-            error: { ...error },
+            fields: { ...fields },
+            error: { ...fields },
             buttonDetails: [...buttonDetails]
         };
+    }
+
+    /**
+     * Sets the error messages in the state if an error was encountered
+     */
+    onError = (errorData) => {
+        let errObj = { ...this.state.error };
+
+        let keys = Object.keys(errorData);
+        keys.map((key, index) => {
+            errObj[key] = errorData[key];
+        })
+
+        this.setState({ error: errObj });
+    }
+
+    /**
+     * Validates the given fields using utils/inputValidation
+     * fields should be in the form of {fieldName: fieldValue, ...}
+     */
+    validateInput = (fields) => {
+        let result = validate(fields);
+
+        if (result) {
+            this.onError(result);
+        } else {
+            this.setState({ error: error }); // reset errors if no validation errors
+        }
+    }
+
+    /**
+     * Checks that all fields are valid
+     */
+    allFieldsValid = () => {
+        const errorValues = Object.values(this.state.errors);
+        for (const error of errorValues) {
+            if (error) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -30,37 +72,24 @@ class AuthForm extends Component {
         }
     }
 
-    /**
-     * Returns the error message of the error property matching the given
-     * fieldName
-     */
-    getMatchingError = (fieldName) => {
-        // if key matches fieldname, return value
-        Object.entries(this.state.errors).map(error => {
-            if (fieldName == error[0]) {
-                return error[1];
-            }
-        });
-
-        return '';
-    }
-
     render() {
         <KeyboardAwareScrollView
-                contentContainerStyle={styles.parentView}
-                resetScrollToCoords={{ x: 0, y: 0 }}
-            >
-                <SafeAreaView style={styles.centered}>
-                {Object.entries(this.state.fields).map(field => 
+            contentContainerStyle={styles.parentView}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+        >
+            <SafeAreaView style={styles.centered}>
+                {Object.entries(this.state.fields).map(field =>
                     <Input
-                    placeholder='INPUT WITH ERROR MESSAGE'
-                    leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
-                    errorStyle={{ color: 'red' }}
-                    errorMessage= {this.getMatchingError(field[0])}
-                  />
+                        placeholder='INPUT WITH ERROR MESSAGE'
+                        leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
+                        errorStyle={{ color: 'red' }}
+                        errorMessage={this.state.error[field[0]]}
+                    />
                 )}
-                </SafeAreaView>
-            </KeyboardAwareScrollView>
+                {
+                }
+            </SafeAreaView>
+        </KeyboardAwareScrollView>
     }
 }
 
@@ -71,21 +100,14 @@ AuthForm.PropTypes = {
         password: PropTypes.string,
         confirmPassword: PropTypes.string,
     }).isRequired,
-    error: PropTypes.shape({
-        general: PropTypes.string.isRequired,
-        email: PropTypes.string,
-        password: PropTypes.string,
-        confirmPassword: PropTypes.string
-    }).isRequired,
     buttonDetails: PropTypes.arrayOf(
         PropTypes.shape({
             buttonTitle: PropTypes.string.isRequired,
             hasSolidColor: PropTypes.bool.isRequired,
             function: PropTypes.func.isRequired
         }).isRequired
-    ).isRequired
+    )
 }
-
 
 const styles = StyleSheet.create({
     parentView: {
