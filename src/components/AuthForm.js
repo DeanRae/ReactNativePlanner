@@ -17,9 +17,50 @@ class AuthForm extends Component {
         };
     }
 
+    /**
+     * Returns the matching icon given the fieldName
+     */
+    getIconName = (fieldName) => {
+        if (fieldName.includes(password)) {
+            return "lock-alt";
+        } else if (fieldName.includes(email)) {
+            return "envelope";
+        } else {
+            return "user";
+        }
+    }
+
+    /**
+     * Returns the error message of the error property matching the given
+     * fieldName
+     */
+    getMatchingError = (fieldName) => {
+        // if key matches fieldname, return value
+        Object.entries(this.state.errors).map(error => {
+            if (fieldName == error[0]) {
+                return error[1];
+            }
+        });
+
+        return '';
+    }
 
     render() {
-        return null;
+        <KeyboardAwareScrollView
+                contentContainerStyle={styles.parentView}
+                resetScrollToCoords={{ x: 0, y: 0 }}
+            >
+                <SafeAreaView style={styles.centered}>
+                {Object.entries(this.state.fields).map(field => 
+                    <Input
+                    placeholder='INPUT WITH ERROR MESSAGE'
+                    leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
+                    errorStyle={{ color: 'red' }}
+                    errorMessage= {this.getMatchingError(field[0])}
+                  />
+                )}
+                </SafeAreaView>
+            </KeyboardAwareScrollView>
     }
 }
 
