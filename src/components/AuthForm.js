@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import PropTypes from 'prop-types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Input } from 'react-native-elements';
+import { Input, Button } from 'react-native-elements';
 import { validate } from '../components/utils/inputValidation';
 
 
@@ -16,7 +16,6 @@ export default class AuthForm extends Component {
         this.state = {
             fields: { ...fields },
             error: { ...initErrors },
-            // buttonDetails: [...buttonDetails]
         };
     }
 
@@ -52,14 +51,14 @@ export default class AuthForm extends Component {
      * Checks that all fields are valid
      */
     allFieldsValid = () => {
-        const errorValues = Object.values(this.state.errors);
-        for (const error of errorValues) {
-            if (error) {
+        let errorKeys = Object.keys(this.props.initErrors);
+
+        return errorKeys.every(key => {
+            if (this.state.error[key] || this.state.fields[key] == "") {
                 return false;
             }
-        }
-
-        return true;
+            return true;
+        });
     }
 
     /**
@@ -117,6 +116,15 @@ export default class AuthForm extends Component {
                             }}
                         />
                     )}
+                    {this.props.buttonDetails.map((buttonDet, key) =>
+                        <Button
+                            type={buttonDet.hasSolidColor ? 'solid' : 'clear'}
+                            raised = {true}
+                            disabled={!this.allFieldsValid()}
+                            title={buttonDet.buttonTitle}
+                            key={key}
+                        />
+                    )}
                 </SafeAreaView>
             </KeyboardAwareScrollView>
         );
@@ -139,9 +147,9 @@ AuthForm.propTypes = {
         PropTypes.shape({
             buttonTitle: PropTypes.string.isRequired,
             hasSolidColor: PropTypes.bool.isRequired,
-            function: PropTypes.func.isRequired
+            submitFunction: PropTypes.func.isRequired
         }).isRequired
-    )
+    ).isRequired
 }
 
 const styles = StyleSheet.create({
