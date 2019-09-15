@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import { StyleSheet, SafeAreaView } from 'react-native';
 import PropTypes from 'prop-types';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Input } from 'react-native-elements';
+import { validate } from '../components/utils/inputValidation';
 
-class AuthForm extends Component {
+
+export default class AuthForm extends Component {
 
     constructor(props) {
         super(props);
 
-        const { fields, buttonDetails } = props;
+        const { fields, initErrors } = props;
 
         this.state = {
             fields: { ...fields },
-            error: { ...fields },
-            buttonDetails: [...buttonDetails]
+            error: { ...initErrors },
+            // buttonDetails: [...buttonDetails]
         };
     }
 
@@ -25,7 +28,7 @@ class AuthForm extends Component {
 
         let keys = Object.keys(errorData);
         keys.map((key, index) => {
-            errObj[key] = errorData[key];
+            errObj[key] = errorData[key][0];
         })
 
         this.setState({ error: errObj });
@@ -41,7 +44,7 @@ class AuthForm extends Component {
         if (result) {
             this.onError(result);
         } else {
-            this.setState({ error: error }); // reset errors if no validation errors
+            this.setState({ error: initErrors }); // reset errors if no validation errors
         }
     }
 
@@ -63,42 +66,74 @@ class AuthForm extends Component {
      * Returns the matching icon given the fieldName
      */
     getIconName = (fieldName) => {
-        if (fieldName.includes(password)) {
-            return "lock-alt";
-        } else if (fieldName.includes(email)) {
+        if (fieldName.toLowerCase().includes("password")) {
+            return "key";
+        } else if (fieldName.includes("email")) {
             return "envelope";
         } else {
             return "user";
         }
     }
 
+    /**
+     * Sets the new state and checks for the validity of the new input 
+     * every time input changes. 
+     */
+    onChangeText = (field, newInput) => {
+        let fieldsObj = {...this.state.fields, [field]: newInput};
+        this.setState({ fields : fieldsObj });
+
+        if (field == 'confirmPassword') {
+            // must supply password as well to check for equality
+            this.validateInput({
+                confirmPassword: newInput,
+                password: this.state.fields.password
+            });
+        } else {
+            this.validateInput({ [field]: newInput });
+        }
+    }
+
     render() {
-        <KeyboardAwareScrollView
-            contentContainerStyle={styles.parentView}
-            resetScrollToCoords={{ x: 0, y: 0 }}
-        >
-            <SafeAreaView style={styles.centered}>
-                {Object.entries(this.state.fields).map(field =>
-                    <Input
-                        placeholder='INPUT WITH ERROR MESSAGE'
-                        leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
-                        errorStyle={{ color: 'red' }}
-                        errorMessage={this.state.error[field[0]]}
-                    />
-                )}
-                {
-                }
-            </SafeAreaView>
-        </KeyboardAwareScrollView>
+        return (
+            <KeyboardAwareScrollView
+                contentContainerStyle={styles.parentView}
+                resetScrollToCoords={{ x: 0, y: 0 }}
+            >
+                <SafeAreaView style={styles.centered}>
+                    {Object.entries(this.props.fields).map((field, key) =>
+                        <Input
+                            label={field[0] == 'confirmPassword' ? 'confirm password' : field[0]}
+                            secureTextEntry={field[0].toLowerCase().includes("password")}
+                            autoCompleteType={field[0] == 'confirmPassword' ? 'password' : field[0]}
+                            autoCapitalize={field[0] == 'name' ? 'words' : 'none'}
+                            leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.error[field[0]]}
+                            key={key}
+                            containerStyle={styles.formComponent}
+                            onChangeText={newInput => {
+                                this.onChangeText(field[0], newInput);
+                            }}
+                        />
+                    )}
+                </SafeAreaView>
+            </KeyboardAwareScrollView>
+        );
     }
 }
 
-AuthForm.PropTypes = {
+AuthForm.propTypes = {
     fields: PropTypes.shape({
         email: PropTypes.string,
         name: PropTypes.string,
         password: PropTypes.string,
         confirmPassword: PropTypes.string,
+    }).isRequired,
+    initErrors: PropTypes.shape({
+        email: PropTypes.string,
+        password: PropTypes.string,
+        confirmPassword: PropTypes.string
     }).isRequired,
     buttonDetails: PropTypes.arrayOf(
         PropTypes.shape({
@@ -120,7 +155,7 @@ const styles = StyleSheet.create({
         margin: 10
     },
     formComponent: {
-        margin: 10,
+        marginBottom: 10,
     },
 });
 
