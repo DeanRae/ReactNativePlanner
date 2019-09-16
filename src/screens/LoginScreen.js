@@ -36,7 +36,12 @@ class LoginScreen extends Component {
       onPressFunc: this.onSubmit
     },
     {
-      buttonTitle: 'Signup',
+      buttonTitle: 'Forgot Password?',
+      hasSolidColor: false,
+      onPressFunc: () => { this.props.navigation.navigate('ResetPasswordScreen') }
+    },
+    {
+      buttonTitle: 'Sign up',
       hasSolidColor: false,
       onPressFunc: () => { this.props.navigation.navigate('Signup') }
     }
