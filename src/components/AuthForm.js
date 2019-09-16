@@ -120,9 +120,10 @@ export default class AuthForm extends Component {
                         <Button
                             type={buttonDet.hasSolidColor ? 'solid' : 'clear'}
                             raised = {true}
-                            disabled={!this.allFieldsValid()}
+                            disabled={buttonDet.hasSolidColor ? !this.allFieldsValid() : false}
                             title={buttonDet.buttonTitle}
                             key={key}
+                            onPress={() => {buttonDet.onPressFunc({...this.state.fields})}}
                         />
                     )}
                 </SafeAreaView>
@@ -147,7 +148,7 @@ AuthForm.propTypes = {
         PropTypes.shape({
             buttonTitle: PropTypes.string.isRequired,
             hasSolidColor: PropTypes.bool.isRequired,
-            submitFunction: PropTypes.func.isRequired
+            onPressFunc: PropTypes.func.isRequired
         }).isRequired
     ).isRequired
 }
