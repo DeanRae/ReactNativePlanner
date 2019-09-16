@@ -45,7 +45,7 @@ const auth = (state = initialState, action) => {
     case types.ERROR_ACKNOWLEDGED:
       return {
         ...state,
-        error: null
+        sessionError: null
       };
     case types.SESSION_LOGOUT:
       return initialState;
