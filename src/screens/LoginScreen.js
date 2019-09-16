@@ -1,65 +1,75 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, ScrollView, Keyboard, SafeAreaView } from 'react-native';
-import { Appbar, TextInput, Button } from 'react-native-paper';
-
-export default class LoginScreen extends Component {
+import { Alert } from 'react-native';
+import { connect } from 'react-redux';
+import LoadingIndicator from '../components/LoadingIndicator';
+import { loginUser, errorDisplayed, restoreSession } from '../actions/user/auth';
+import AuthForm from '../components/AuthForm';
+class LoginScreen extends Component {
 
   static navigationOptions = () => ({
     title: 'Login'
   });
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: '',
-      password: ''
-    };
+
+  componentDidUpdate = (prevProps) => {
+    if (this.props.user && !this.props.error && this.props.logged) {
+      this.props.navigation.navigate('App');
+    }
+
+    if (this.props.error) {
+      Alert.alert(
+        'Login Error',
+        this.props.error,
+      );
+
+      this.props.errorDisplayed();
+    }
+  }
+
+  onSubmit = (data) => {
+    this.props.login(data);
   }
 
   render() {
+    const buttonDetails = [{
+      buttonTitle: 'Login',
+      hasSolidColor: true,
+      onPressFunc: this.onSubmit
+    },
+    {
+      buttonTitle: 'Signup',
+      hasSolidColor: false,
+      onPressFunc: () => { this.props.navigation.navigate('Signup') }
+    }
+    ];
+
+    const fields = {
+      email: '',
+      password: '',
+    };
+
     return (
-      <ScrollView contentContainerStyle={styles.parentView} scrollEnabled={false}>
-        <SafeAreaView style={styles.centered}>
-          <TextInput
-            mode='outlined'
-            label='Email'
-            keyboardType="email-address"
-            value={this.state.email}
-            onChangeText={email => this.setState({ email })}
-            onBlur={() => Keyboard.dismiss()}
-            style={styles.formComponent}
-          />
-          <TextInput
-            mode='outlined'
-            label='Password'
-            secureTextEntry={true}
-            value={this.state.email}
-            onChangeText={email => this.setState({ email })}
-            onBlur={() => Keyboard.dismiss()}
-            style={styles.formComponent}
-          />
-          <Button style={styles.formComponent} contentStyle={{ height: 56 }} mode="contained" onPress={() => console.log('Pressed')}>
-            Login
-          </Button>
-
-        </SafeAreaView>
-      </ScrollView>
-
+      this.props.loading ?
+        <LoadingIndicator /> :
+        <AuthForm fields={fields} initErrors={fields} buttonDetails={buttonDetails} />
     );
   }
 }
 
-const styles = StyleSheet.create({
-  parentView: {
-    flexGrow: 1,
-    justifyContent: 'space-between'
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    margin: 10
-  },
-  formComponent: {
-    margin: 10,
-  },
+const mapStateToProps = ({ auth: { sessionLoading, sessionError, restoring, user, logged } }) => ({
+  loading: sessionLoading,
+  error: sessionError,
+  restoring: restoring,
+  user: user,
+  logged: logged
 });
+
+const mapDispatchToProps = {
+  login: loginUser,
+  restore: restoreSession,
+  errorDisplayed
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginScreen)
