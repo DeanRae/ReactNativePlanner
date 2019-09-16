@@ -6,7 +6,8 @@ const initialState = {
   user: {},
   sessionError: null,
   logged: null,
-  registered: null
+  registered: null,
+  resetPassword: false
 };
 
 const auth = (state = initialState, action) => {
@@ -23,6 +24,7 @@ const auth = (state = initialState, action) => {
         user: action.user,
         sessionError: null,
         logged: true,
+        resetPassword: false
       };
     case types.SIGNUP_SUCCESS:
       return {
@@ -32,6 +34,7 @@ const auth = (state = initialState, action) => {
         user: action.user,
         sessionError: null,
         logged: true,
+        resetPassword: false
       };
     case types.SESSION_ERROR:
       return {
@@ -41,6 +44,7 @@ const auth = (state = initialState, action) => {
         user: null,
         sessionError: action.error,
         logged: null,
+        resetPassword: false
       };
     case types.ERROR_ACKNOWLEDGED:
       return {
@@ -54,6 +58,11 @@ const auth = (state = initialState, action) => {
         return state;
       }
       return {...state, user:{...state.user,...action.data}};
+    case types.EMAILED_PASSWORD_RESET:
+      return {
+        ...state,
+        resetPassword: action.resetPassword
+      }
     default:
       return state;
   }

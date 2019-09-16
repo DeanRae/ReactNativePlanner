@@ -59,10 +59,18 @@ export const loginUser = (data) => dispatch => {
         });
 };
 
+/**
+ * Resets the error state as the error has been displayed to the user by the GUI
+ */
 export const errorDisplayed = () => dispatch => {
     dispatch(errorAcknowledged());
 }
 
+/**
+ * Checks if user is already logged in and allows the app pages to be served 
+ * to user if true. Else state is reinitialized to init state and only
+ * authentication pages are accessible. 
+ */
 export const restoreSession = () => dispatch => {
     dispatch(sessionLoading());
     dispatch(sessionRestoring());
@@ -81,6 +89,9 @@ export const restoreSession = () => dispatch => {
         });
 };
 
+/**
+ * Logs the user out and initializes the state to initial state.
+ */
 export const logoutUser = () => dispatch => {
     dispatch(sessionLoading());
 
@@ -94,6 +105,11 @@ export const logoutUser = () => dispatch => {
         });
 };
 
+/**
+ * Sets the user's name in both firestore database and in 
+ * user firebase object displayName.
+ * @param {string} name 
+ */
 export const updateUserName = (name) => (dispatch, getState) => {
     const { auth } = getState();
     const user = { ...auth.user };
@@ -115,6 +131,12 @@ export const updateUserName = (name) => (dispatch, getState) => {
         });
 };
 
+/**
+ * Updates the user's email in firestore and in authentication. 
+ * It does this by validating the user's credentials first.
+ * @param {string} newEmail 
+ * @param {string} password 
+ */
 export const updateUserEmail = (newEmail, password) => (dispatch, getState) => {
     const { auth } = getState();
     const user = { ...auth.user };
@@ -136,12 +158,16 @@ export const updateUserEmail = (newEmail, password) => (dispatch, getState) => {
         });
 };
 
-
+/**
+ * Update's the user's password by first validating the user's credentials.
+ * @param {*} newPassword 
+ * @param {*} oldPassword 
+ */
 export const updatePassword = (newPassword, oldPassword) => (dispatch, getState) => {
     const { auth } = getState();
     const user = { ...auth.user };
 
-    const cred = credential(user, password);
+    const cred = credential(user, oldPassword);
 
     user
         .reauthenticateAndRetrieveDataWithCredential(cred)
@@ -155,6 +181,33 @@ export const updatePassword = (newPassword, oldPassword) => (dispatch, getState)
         });
 
 };
+
+/**
+ * Sends an email to user with password reset link
+ * @param {*} data 
+ */
+export const resetPassword = (data) => (dispatch) => {
+    const { email } = data;
+
+    auth
+        .sendPasswordResetEmail(email)
+        .then(() => {
+            dispatch(emailedPasswordReset());
+        })
+        .catch(error => {
+            dispatch(sessionError(error.message));
+        });
+};
+
+export const alertDisplayed = () => ({
+    type: types.EMAILED_PASSWORD_RESET,
+    passwordReset: false
+});
+
+const emailedPasswordReset = () => ({
+    type: types.EMAILED_PASSWORD_RESET,
+    passwordReset: true
+})
 
 const userProfileModified = data => ({
     type: types.USER_PROFILE_MODIFIED,
