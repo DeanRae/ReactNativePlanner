@@ -10,6 +10,8 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen'
+import CalendarScreen from '../screens/CalendarScreen';
+import TaskListsScreen from '../screens/TaskListsScreen';
 
 /**
  * Create navigation that's only accessible once authenticated 
@@ -17,6 +19,8 @@ import ResetPasswordScreen from '../screens/ResetPasswordScreen'
 const AppNav = createBottomTabNavigator(
   {
     Home: HomeScreen,
+    TaskLists: TaskListsScreen,
+    Calendar: CalendarScreen,
     Profile: ProfileScreen
   },
   {
@@ -56,6 +60,8 @@ const getTabBarIcon = (navigation, focused, tintColor) => {
     case 'Profile':
       iconName = 'ios-person';
       break;
+    case 'Calendar':
+      iconName = 'ios-calendar'
   }
 
   return <IconComponent name={iconName} size={25} color={tintColor} />;
