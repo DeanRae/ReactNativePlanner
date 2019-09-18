@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Input, Button } from 'react-native-elements';
 import { validate } from '../components/utils/inputValidation';
-
+import styles from '../components/utils/globalStyles';
 
 export default class AuthForm extends Component {
 
@@ -13,14 +13,10 @@ export default class AuthForm extends Component {
 
         const { fields, initErrors } = props;
 
-
-
         this.state = {
             fields: this.setFieldProperties(fields, initErrors),
             error: { ...initErrors },
         };
-
-        console.log("stts", this.state)
     }
 
     setFieldProperties = (fields, initErrors) => {
@@ -115,10 +111,32 @@ export default class AuthForm extends Component {
         }
     }
 
+    /**
+     * Extracts the values from the state and returns in it an 
+     * object key pair of fielName: value
+     */
     extractValues = () => {
-        Object.keys(this.state.fields)
+        return Object.keys(this.state.fields)
             .reduce((obj, field) => (
                 obj[field] = this.state.fields[field].value, obj), {});
+    }
+
+    /**
+     * Gets the appropriate textContentType for an Input given the field name
+     */
+    getContentType = (field) => {
+        switch (field) {
+            case 'email': 
+                return 'emailAddress';
+            case 'password':
+                return 'password';
+            case 'confirmPassword':
+                return 'newPassword';
+            case 'name':
+                return 'name';
+            default:
+                return 'none';
+        }
     }
 
     render() {
@@ -132,11 +150,12 @@ export default class AuthForm extends Component {
                         const { fieldName } = this.state.fields[field[0]];
                         const isPassword = field[0].toLowerCase().includes("password");
                         const fieldKey = field[0];
-
+            
                         return <Input
                             label={fieldName}
                             secureTextEntry={isPassword}
                             autoCompleteType={isPassword ? 'password' : fieldKey}
+                            textContentType={this.getContentType(field[0])}
                             autoCapitalize={fieldKey == 'name' ? 'words' : 'none'}
                             keyboardType={fieldKey == 'email' ? 'email-address' : 'default'}
                             leftIcon={{ type: 'ionicon', name: this.getIconName(fieldKey), color: '#43484d' }}
@@ -185,24 +204,4 @@ AuthForm.propTypes = {
         }).isRequired
     ).isRequired
 }
-
-const styles = StyleSheet.create({
-    parentView: {
-        flexGrow: 1,
-        justifyContent: 'center',
-
-    },
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        margin: 10
-    },
-    formComponent: {
-        marginBottom: 30,
-    },
-    buttonStyle: {
-        marginBottom: 10,
-        height: 54
-    }
-});
 
