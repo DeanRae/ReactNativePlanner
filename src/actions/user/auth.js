@@ -189,7 +189,7 @@ export const updatePassword = (newPassword, oldPassword) => (dispatch, getState)
 export const resetPassword = (data) => (dispatch) => {
     const { email } = data;
 
-    auth
+    auth()
         .sendPasswordResetEmail(email)
         .then(() => {
             dispatch(emailedPasswordReset());
