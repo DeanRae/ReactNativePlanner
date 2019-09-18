@@ -13,10 +13,31 @@ export default class AuthForm extends Component {
 
         const { fields, initErrors } = props;
 
+
+
         this.state = {
-            fields: { ...fields },
+            fields: this.setFieldProperties(fields, initErrors),
             error: { ...initErrors },
         };
+
+        console.log("stts", this.state)
+    }
+
+    setFieldProperties = (fields, initErrors) => {
+        return Object.keys(fields)
+            .reduce((obj, field) => (
+                obj[field] = { fieldName: this.formatFieldName(field, initErrors), value: '' }, obj), {});
+    }
+
+    /**
+     * Splits camel casing and capitalizes first letter.
+     * If field is present in errors, then field is required and
+     * is attached (Required) tag
+     */
+    formatFieldName = (fieldName, initErrors) => {
+        let formattedFieldName = fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => { return str.toUpperCase() });
+
+        return fieldName in initErrors ? formattedFieldName + " (Required)" : formattedFieldName;
     }
 
     /**
@@ -54,7 +75,7 @@ export default class AuthForm extends Component {
         let errorKeys = Object.keys(this.props.initErrors);
 
         return errorKeys.every(key => {
-            if (this.state.error[key] || this.state.fields[key] == "") {
+            if (this.state.error[key] || this.state.fields[key].value == "") {
                 return false;
             }
             return true;
@@ -66,11 +87,11 @@ export default class AuthForm extends Component {
      */
     getIconName = (fieldName) => {
         if (fieldName.toLowerCase().includes("password")) {
-            return "key";
+            return "ios-key";
         } else if (fieldName.includes("email")) {
-            return "envelope";
+            return "ios-mail";
         } else {
-            return "user";
+            return "ios-person";
         }
     }
 
@@ -79,8 +100,9 @@ export default class AuthForm extends Component {
      * every time input changes. 
      */
     onChangeText = (field, newInput) => {
-        let fieldsObj = {...this.state.fields, [field]: newInput};
-        this.setState({ fields : fieldsObj });
+        let changedField = { ...this.state.fields[field], value: newInput };
+        let fieldsObj = { ...this.state.fields, [field]: changedField };
+        this.setState({ fields: fieldsObj });
 
         if (field == 'confirmPassword') {
             // must supply password as well to check for equality
@@ -93,6 +115,12 @@ export default class AuthForm extends Component {
         }
     }
 
+    extractValues = () => {
+        Object.keys(this.state.fields)
+            .reduce((obj, field) => (
+                obj[field] = this.state.fields[field].value, obj), {});
+    }
+
     render() {
         return (
             <KeyboardAwareScrollView
@@ -100,30 +128,35 @@ export default class AuthForm extends Component {
                 resetScrollToCoords={{ x: 0, y: 0 }}
             >
                 <SafeAreaView style={styles.centered}>
-                    {Object.entries(this.props.fields).map((field, key) =>
-                        <Input
-                            label={field[0] == 'confirmPassword' ? 'confirm password' : field[0]}
-                            secureTextEntry={field[0].toLowerCase().includes("password")}
-                            autoCompleteType={field[0] == 'confirmPassword' ? 'password' : field[0]}
-                            autoCapitalize={field[0] == 'name' ? 'words' : 'none'}
-                            leftIcon={{ type: 'font-awesome', name: this.getIconName(field[0]) }}
+                    {Object.entries(this.props.fields).map((field, key) => {
+                        const { fieldName } = this.state.fields[field[0]];
+                        const isPassword = field[0].toLowerCase().includes("password");
+                        const fieldKey = field[0];
+
+                        return <Input
+                            label={fieldName}
+                            secureTextEntry={isPassword}
+                            autoCompleteType={isPassword ? 'password' : fieldKey}
+                            autoCapitalize={fieldKey == 'name' ? 'words' : 'none'}
+                            keyboardType={fieldKey == 'email' ? 'email-address' : 'default'}
+                            leftIcon={{ type: 'ionicon', name: this.getIconName(fieldKey), color: '#43484d' }}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.error[field[0]]}
+                            errorMessage={this.state.error[fieldKey]}
                             key={key}
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
-                                this.onChangeText(field[0], newInput);
+                                this.onChangeText(fieldKey, newInput);
                             }}
                         />
-                    )}
+                    })}
                     {this.props.buttonDetails.map((buttonDet, key) =>
                         <Button
                             type={buttonDet.hasSolidColor ? 'solid' : 'clear'}
-                            raised = {true}
                             disabled={buttonDet.hasSolidColor ? !this.allFieldsValid() : false}
                             title={buttonDet.buttonTitle}
+                            buttonStyle={styles.buttonStyle}
                             key={key}
-                            onPress={() => {buttonDet.onPressFunc({...this.state.fields})}}
+                            onPress={() => { buttonDet.onPressFunc(this.extractValues()) }}
                         />
                     )}
                 </SafeAreaView>
@@ -156,7 +189,8 @@ AuthForm.propTypes = {
 const styles = StyleSheet.create({
     parentView: {
         flexGrow: 1,
-        justifyContent: 'space-between'
+        justifyContent: 'center',
+
     },
     centered: {
         flex: 1,
@@ -164,7 +198,11 @@ const styles = StyleSheet.create({
         margin: 10
     },
     formComponent: {
-        marginBottom: 10,
+        marginBottom: 30,
     },
+    buttonStyle: {
+        marginBottom: 10,
+        height: 54
+    }
 });
 
