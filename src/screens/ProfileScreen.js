@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, Text, SafeAreaView } from 'react-native';
+import { View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { updatePassword, updateUserEmail, updateUserName, errorDisplayed, logoutUser } from '../actions/user/auth';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Input } from 'react-native-elements';
-import { Button } from 'native-base';
-
+import { Input, Button, Header } from 'react-native-elements';
+import { Snackbar } from 'react-native-paper';
+import styles from '../components/utils/globalStyles';
+import InputDialog from '../components/InputDialog';
+import { createTitleFromFieldName } from '../components/utils/textTransformations';
 
 const fields = {
   name: '',
   email: '',
   password: '',
+  newPassword: '',
 }
+
+const visibleState = {
+  snackbar: false,
+  name: false,
+  email: false,
+  password: false,
+};
 class ProfileScreen extends Component {
 
   static navigationOptions = () => ({
@@ -22,8 +31,11 @@ class ProfileScreen extends Component {
   constructor(props) {
     super(props);
 
-    const visibleState = {};
-    Object.keys(fields).forEach((key) => { visibleState[key] = false });
+    Object.keys(fields).forEach((key) => {
+      if (!key.toLowerCase().includes("password")) {
+        fields[key] = this.getUserProfileValues(key);
+      }
+    });
 
     this.state = {
       ...fields,
@@ -31,6 +43,7 @@ class ProfileScreen extends Component {
         ...visibleState
       }
     };
+
   }
 
   componentDidUpdate = (prevProps) => {
@@ -49,15 +62,26 @@ class ProfileScreen extends Component {
     }
   }
 
-  toggleOpacity = (fieldName) => {
+  /**
+   * Toggles the visibility of the dialogs and snackbar. 
+   * Snackbar's visibility is toggled if any of the dialogs were
+   * previously true.
+   */
+  toggleVisibility = (fieldName) => {
+    prevVisib = fieldName != 'snackbar' ? this.state.visibleState[fieldName] : false;
     const visibleState = {
       ...this.state.visibleState,
-      fieldName: !this.state.visibleState[fieldName]
+      [fieldName]: !prevVisib,
+      ['snackbar']: prevVisib ? true : false
     }
+    console.log("toggling state", visibleState);
 
     this.setState({ visibleState });
   }
 
+  /**
+   * Returns the values of the field based on current profile settings
+   */
   getUserProfileValues = (fieldName) => {
     switch (fieldName) {
       case 'name':
@@ -69,40 +93,105 @@ class ProfileScreen extends Component {
     }
   }
 
+  /**
+   * Sets the values of the fields to match what is being inputted in the dialog
+   */
+  handleInputChange = (fieldName, newInput) => {
+    this.setState({ [fieldName === 'oldPassword' ? 'password' : fieldName]: newInput });
+
+  }
+
+  /**
+   * Refreshes the state when dialog is canceled
+   */
+  handleCancel = () => {
+    this.setState({ ...fields, visibleState: { ...visibleState } });
+  }
+
   render() {
     return (
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.parentView}
-        resetScrollToCoords={{ x: 0, y: 0 }}
-      >
+      <View style={styles.parentView}>
+        <Header
+          centerComponent={{ text: 'Profile Settings', style: styles.header }}
+          backgroundColor="white"
+          containerStyle={styles.headerContainer}
+          statusBarProps={{ barStyle: 'dark-content' }}
+        />
         {this.props.loading ? (
           <LoadingIndicator />
         ) : (
             <SafeAreaView style={styles.centered}>
-              
+
+              {Object.keys(fields).map((field, key) => {
+                if (field == "newPassword") return;
+                console.log("renderin");
+                return <TouchableOpacity
+                  onPress={() => { this.toggleVisibility(field) }}
+                  style={{ zIndex: 5 }}
+                  key={key}
+                >
+                  <Input
+                    disabled={true}
+                    pointerEvents="none"
+                    label={createTitleFromFieldName(field)}
+                    value={this.getUserProfileValues(field)}
+                    rightIcon={{ type: 'ionicon', name: 'md-create' }}
+                    containerStyle={styles.formComponent}
+                    key={key}
+                  />
+                </TouchableOpacity>
+              })}
+
+              <InputDialog
+                title="Update Display Name"
+                inputs={{ name: this.state["name"] }}
+                isVisible={this.state.visibleState["name"]}
+                onSaveFunc={() => {                               
+                  this.toggleVisibility("name"); 
+                  this.props.updateUserName(this.state["name"]); 
+                  }}
+                onChangeFunc={this.handleInputChange}
+                onCancelFunc={this.handleCancel}
+              />
+              <InputDialog
+                title="Update Email Address"
+                inputs={{ email: this.state["email"], password: this.state["password"] }}
+                isVisible={this.state.visibleState["email"]}
+                onSaveFunc={() => { 
+                  this.toggleVisibility("email"); 
+                  this.props.updateUserEmail(this.state["email"], this.state["password"]); }}
+                onChangeFunc={this.handleInputChange}
+                onCancelFunc={this.handleCancel}
+              />
+              <InputDialog
+                title="Update Password"
+                inputs={{ oldPassword: this.state["password"], newPassword: this.state["newPassword"] }}
+                isVisible={this.state.visibleState["password"]}
+                onSaveFunc={() => { 
+                  this.toggleVisibility("password"); 
+                  this.props.updatePassword(this.state["newPassword"], this.state["password"]); }}
+                onChangeFunc={this.handleInputChange}
+                onCancelFunc={this.handleCancel}
+              />
+              <Button
+                title="Logout"
+                onPress={() => { this.props.logout() }}
+                buttonStyle={styles.logoutButtonStyle}
+              />
+              <Snackbar
+                visible={this.state.visibleState['snackbar']}
+                onDismiss={() => this.toggleVisibility("snackbar")}
+                duration={Snackbar.DURATION_SHORT}
+              >
+                Profile Updated 
+        </Snackbar>
+
             </SafeAreaView>
           )}
-
-      </KeyboardAwareScrollView>
-
+      </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  parentView: {
-    flexGrow: 1,
-    justifyContent: 'space-between'
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    margin: 10
-  },
-  formComponent: {
-    margin: 10,
-  },
-});
 
 const mapStateToProps = ({ auth: { sessionLoading, sessionError, user, restoring, logged } }) => ({
   loading: sessionLoading,
