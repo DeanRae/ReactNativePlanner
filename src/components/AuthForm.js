@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Input, Button } from 'react-native-elements';
 import { validate } from '../components/utils/inputValidation';
 import styles from '../components/utils/globalStyles';
+import {createTitleFromFieldName} from '../components/utils/textTransformations';
 
 export default class AuthForm extends Component {
 
@@ -31,8 +32,8 @@ export default class AuthForm extends Component {
      * is attached (Required) tag
      */
     formatFieldName = (fieldName, initErrors) => {
-        let formattedFieldName = fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => { return str.toUpperCase() });
-
+        let formattedFieldName = createTitleFromFieldName(fieldName);
+        
         return fieldName in initErrors ? formattedFieldName + " (Required)" : formattedFieldName;
     }
 
