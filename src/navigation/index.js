@@ -9,6 +9,7 @@ import SignupScreen from '../screens/SignupScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen'
 
 /**
  * Create navigation that's only accessible once authenticated 
@@ -32,7 +33,8 @@ const AppNav = createBottomTabNavigator(
 const AuthNav = createStackNavigator(
   {
     Login: LoginScreen,
-    Signup: SignupScreen
+    Signup: SignupScreen,
+    ResetPassword: ResetPasswordScreen,
   }
 );
 
