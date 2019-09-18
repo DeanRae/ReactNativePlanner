@@ -61,7 +61,11 @@ const getTabBarIcon = (navigation, focused, tintColor) => {
       iconName = 'ios-person';
       break;
     case 'Calendar':
-      iconName = 'ios-calendar'
+      iconName = 'ios-calendar';
+      break;
+    case 'TaskLists':
+      iconName = `ios-checkbox${focused ? '' : '-outline'}`;
+      break;
   }
 
   return <IconComponent name={iconName} size={25} color={tintColor} />;
