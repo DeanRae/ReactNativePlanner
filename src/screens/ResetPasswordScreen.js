@@ -17,7 +17,7 @@ class LoginScreen extends Component {
         );
 
         this.props.alertDisplayed();
-        this.props.navigation.navigate('Login');
+        this.props.navigation.goBack();
     }
 
     if (this.props.error) {
