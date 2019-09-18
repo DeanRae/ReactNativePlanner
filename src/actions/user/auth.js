@@ -1,4 +1,4 @@
-import { auth, firestore, serverTimestamp, credential, currentUser } from "../../services/firebase";
+import { auth, firestore, credential } from "../../services/firebase";
 import * as types from './actionTypes';
 /**
  * Code adapted from: 
@@ -110,10 +110,8 @@ export const logoutUser = () => dispatch => {
  * user firebase object displayName.
  * @param {string} name 
  */
-export const updateUserName = (name) => (dispatch, getState) => {
-    const { auth } = getState();
-    const user = { ...auth.user };
-
+export const updateUserName = (name) => dispatch => {
+    const user = auth().currentUser;
     user
         .updateProfile({
             displayName: name
@@ -137,9 +135,8 @@ export const updateUserName = (name) => (dispatch, getState) => {
  * @param {string} newEmail 
  * @param {string} password 
  */
-export const updateUserEmail = (newEmail, password) => (dispatch, getState) => {
-    const { auth } = getState();
-    const user = { ...auth.user };
+export const updateUserEmail = (newEmail, password) => dispatch => {
+    const user = auth().currentUser;
 
     const cred = credential(user, password);
 
@@ -163,9 +160,8 @@ export const updateUserEmail = (newEmail, password) => (dispatch, getState) => {
  * @param {*} newPassword 
  * @param {*} oldPassword 
  */
-export const updatePassword = (newPassword, oldPassword) => (dispatch, getState) => {
-    const { auth } = getState();
-    const user = { ...auth.user };
+export const updatePassword = (newPassword, oldPassword) => dispatch => {
+    const user = auth().currentUser;
 
     const cred = credential(user, oldPassword);
 
@@ -186,7 +182,7 @@ export const updatePassword = (newPassword, oldPassword) => (dispatch, getState)
  * Sends an email to user with password reset link
  * @param {*} data 
  */
-export const resetPassword = (data) => (dispatch) => {
+export const resetPassword = (data) => dispatch => {
     const { email } = data;
 
     auth()
