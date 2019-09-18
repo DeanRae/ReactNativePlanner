@@ -54,10 +54,7 @@ const auth = (state = initialState, action) => {
     case types.SESSION_LOGOUT:
       return initialState;
     case types.USER_PROFILE_MODIFIED:
-      if (!action.data) {
-        return state;
-      }
-      return {...state, user:{...state.user,...action.data}};
+      return {...state, ...action.user};
     case types.EMAILED_PASSWORD_RESET:
       return {
         ...state,

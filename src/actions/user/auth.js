@@ -121,7 +121,7 @@ export const updateUserName = (name) => dispatch => {
                 .doc(`/userProfile/${user.uid}`)
                 .update({ name })
                 .then(() => {
-                    dispatch(userProfileModified({ name: name }));
+                    dispatch(userProfileModified({ user: user }));
                 });
         })
         .catch(error => {
@@ -141,14 +141,15 @@ export const updateUserEmail = (newEmail, password) => dispatch => {
     const cred = credential(user, password);
 
     user
-        .reauthenticateAndRetrieveDataWithCredential(cred)
+        .reauthenticateWithCredential(cred)
         .then(() => {
-            user.updateEmail(newEmail).then(() => {
+            user.updateEmail(newEmail)
+                .then(() => {
                 firestore()
                     .doc(`/userProfile/${user.uid}`)
                     .update({ email: newEmail });
             });
-            dispatch(userProfileModified({ email: newEmail }));
+            dispatch(userProfileModified({ user: user }));
         })
         .catch(error => {
             dispatch(sessionError(error.message));
@@ -166,10 +167,10 @@ export const updatePassword = (newPassword, oldPassword) => dispatch => {
     const cred = credential(user, oldPassword);
 
     user
-        .reauthenticateAndRetrieveDataWithCredential(cred)
+        .reauthenticateWithCredential(cred)
         .then(() => {
             this.currentUser.updatePassword(newPassword).then(() => {
-                dispatch(userProfileModified(null));
+                dispatch(userProfileModified({ user: user }));
             });
         })
         .catch(error => {
@@ -205,9 +206,9 @@ const emailedPasswordReset = () => ({
     passwordReset: true
 })
 
-const userProfileModified = data => ({
+const userProfileModified = user => ({
     type: types.USER_PROFILE_MODIFIED,
-    data
+    user
 })
 
 const sessionRestoring = () => ({
