@@ -61,7 +61,7 @@ const auth = (state = initialState, action) => {
     case types.EMAILED_PASSWORD_RESET:
       return {
         ...state,
-        resetPassword: action.resetPassword
+        resetPassword: action.passwordReset,
       }
     default:
       return state;
