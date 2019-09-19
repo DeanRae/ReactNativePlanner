@@ -7,7 +7,13 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import styles from '../components/utils/globalStyles';
 import { createTitleFromFieldName } from '../components/utils/textTransformations';
+import ProgressBar from '../components/ProgressBar';
 
+const initState ={
+    completionRate: 0,
+    title: '',
+    location: '',
+}
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         const routeName = navigation.state.routeName;
@@ -15,6 +21,16 @@ class TaskDetailsScreen extends Component {
             title: createTitleFromFieldName(routeName),
         }
     };
+
+    constructor(props) {
+        super(props);
+
+        const params = this.getNavParams(props.navigation);
+
+        this.state = {
+            ...initState
+        }
+    }
 
     componentDidUpdate = (prevProps) => {
 
@@ -63,18 +79,23 @@ class TaskDetailsScreen extends Component {
                     resetScrollToCoords={{ x: 0, y: 0 }}
                 >
                     <SafeAreaView style={styles.centered}>
-                        <Slider
-                            value={0.5}
-                            disabled={true}
+                        <Input
+                            label='Title *'
+                            containerStyle={styles.formComponent}
+                            onChangeText={newInput => {
+                                this.setState({title: newInput})
+                            }}
                         />
+                         <Input
+                            label='Location'
+                            containerStyle={styles.formComponent}
+                            onChangeText={newInput => {
+                                this.setState({location: newInput})
+                            }}
+                        />
+                        <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
+                        <ProgressBar disabled value={this.state.completionRate} />
 
-                        {/* <View style={styles.progressBar}>
-                            <Text style={styles.progressBarText}>0</Text>
-                        <ProgressViewIOS progress={0.5} style={styles.progressBarHeight} progressTintColor= {styles.barColors.color}/>
-                        <Text style={styles.progressBarText}>100</Text>
-                        </View> */}
-                       
-                        
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
 
