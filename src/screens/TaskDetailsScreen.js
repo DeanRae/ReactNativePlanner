@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 import { Header, Button } from 'react-native-elements';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import styles from '../components/utils/globalStyles';
@@ -53,11 +54,20 @@ class TaskDetailsScreen extends Component {
         const taskId = navigation.getParam('id', '');
         const isEdit = navigation.getParam('isEdit', false);
         return (
-                this.props.loading ? (
-                    <LoadingIndicator />
-                ) : null
-                    
-            
+            this.props.loading ? (
+                <LoadingIndicator />
+            ) :
+
+                <KeyboardAwareScrollView
+                    contentContainerStyle={styles.parentView}
+                    resetScrollToCoords={{ x: 0, y: 0 }}
+                >
+                    <SafeAreaView style={styles.centered}>
+
+                    </SafeAreaView>
+                </KeyboardAwareScrollView>
+
+
         );
     }
 }
