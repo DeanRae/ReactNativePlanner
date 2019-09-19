@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, ProgressViewIOS, Text, View } from 'react-native';
 import { connect } from 'react-redux';
-import { Header, Button } from 'react-native-elements';
+import { Header, Button, Input, Slider } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
@@ -63,7 +63,18 @@ class TaskDetailsScreen extends Component {
                     resetScrollToCoords={{ x: 0, y: 0 }}
                 >
                     <SafeAreaView style={styles.centered}>
+                        <Slider
+                            value={0.5}
+                            disabled={true}
+                        />
 
+                        {/* <View style={styles.progressBar}>
+                            <Text style={styles.progressBarText}>0</Text>
+                        <ProgressViewIOS progress={0.5} style={styles.progressBarHeight} progressTintColor= {styles.barColors.color}/>
+                        <Text style={styles.progressBarText}>100</Text>
+                        </View> */}
+                       
+                        
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
 

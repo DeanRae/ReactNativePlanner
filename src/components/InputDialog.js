@@ -5,25 +5,8 @@ import Dialog from "react-native-dialog";
 import {createTitleFromFieldName} from './utils/textTransformations';
 
 export default class InputDialog extends Component {
-
-
-    toggleOpacity = (fieldName) => {
-        const visibleState = {
-            ...this.state.visibleState,
-            fieldName: !this.state.visibleState[fieldName]
-        }
-
-        this.setState({ visibleState });
-    }
-
-    handleCancel = () => {
-        this.setState({ dialogVisible: false });
-    };
-
     render() {
         return (
-
-
             <View>
                 <Dialog.Container visible={this.props.isVisible}>
                     <Dialog.Title>{this.props.title}</Dialog.Title>
