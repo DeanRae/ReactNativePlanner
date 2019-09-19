@@ -10,12 +10,13 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen'
-import CalendarScreen from '../screens/CalendarScreen';
+import CalendarScreen from '../screens/Calendar/CalendarScreen';
 import TaskListsScreen from '../screens/TaskListsScreen';
 import TaskDetailsScreen from '../screens/TaskDetailsScreen';
 
 const AppTabs = createBottomTabNavigator(
   {
+    TaskDetails: TaskDetailsScreen,
     Home: HomeScreen,
     TaskLists: TaskListsScreen,
     Calendar: CalendarScreen,
