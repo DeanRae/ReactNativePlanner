@@ -22,7 +22,7 @@ class LoginScreen extends Component {
 
     if (this.props.error) {
       Alert.alert(
-        'Login Error',
+        'Error',
         this.props.error,
       );
 

@@ -54,7 +54,7 @@ class ProfileScreen extends Component {
 
     if (this.props.error) {
       Alert.alert(
-        'User Profile Error',
+        'Error',
         this.props.error,
       );
 

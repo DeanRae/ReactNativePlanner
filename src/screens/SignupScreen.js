@@ -16,7 +16,7 @@ class SignupScreen extends Component {
 
         if (this.props.error) {
             Alert.alert(
-                'Signup Error',
+                'Error',
                 this.props.error,
             );
 
