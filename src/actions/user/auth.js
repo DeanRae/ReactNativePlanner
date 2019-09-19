@@ -111,6 +111,7 @@ export const logoutUser = () => dispatch => {
  * @param {string} name 
  */
 export const updateUserName = (name) => dispatch => {
+    dispatch(sessionLoading());
     const user = auth().currentUser;
     user
         .updateProfile({
@@ -136,8 +137,8 @@ export const updateUserName = (name) => dispatch => {
  * @param {string} password 
  */
 export const updateUserEmail = (newEmail, password) => dispatch => {
+    dispatch(sessionLoading());
     const user = auth().currentUser;
-
     const cred = credential(user, password);
 
     user
@@ -162,8 +163,8 @@ export const updateUserEmail = (newEmail, password) => dispatch => {
  * @param {*} oldPassword 
  */
 export const updatePassword = (newPassword, oldPassword) => dispatch => {
+    dispatch(sessionLoading());
     const user = auth().currentUser;
-
     const cred = credential(user, oldPassword);
 
     user
