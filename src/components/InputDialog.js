@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import Dialog from "react-native-dialog";
-import {createTitleFromFieldName} from './utils/textTransformations'
+import {createTitleFromFieldName} from './utils/textTransformations';
 
 export default class InputDialog extends Component {
 
@@ -34,6 +34,7 @@ export default class InputDialog extends Component {
                             label={createTitleFromFieldName(field[0])}
                             secureTextEntry={isPassword}
                             autoCompleteType={isPassword ? 'password' : field[0]}
+                            autoFocus={key==0 ? true :false}
                             onChangeText={newInput => {
                                 this.props.onChangeFunc(field[0], newInput);
                             }}
