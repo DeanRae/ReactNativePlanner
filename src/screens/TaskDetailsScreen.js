@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { Header } from 'react-native-elements';
+import { Header, Button } from 'react-native-elements';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import styles from '../components/utils/globalStyles';
+import { createTitleFromFieldName } from '../components/utils/textTransformations';
 
 class TaskDetailsScreen extends Component {
-    static navigationOptions = () => ({
-        title: 'Task Detail',
-    });
+    static navigationOptions = ({ navigation }) => {
+        const routeName = navigation.state.routeName;
+        return {
+            title: createTitleFromFieldName(routeName),
+        }
+    };
 
     componentDidUpdate = (prevProps) => {
 
@@ -24,23 +27,47 @@ class TaskDetailsScreen extends Component {
         }
     }
 
+    getNavParams = (navigation) => {
+        return {
+            taskId: navigation.getParam('id', ''),
+            isEdit: navigation.getParam('isEdit', false)
+        };
+    }
+
+    getHeaderTitle = () => {
+        const { navigation } = this.props;
+        const params = this.getNavParams(navigation);
+
+        if (params.taskId && params.isEdit) {
+            return 'Edit Task';
+        } else if (params.taskId && !params.isEdit) {
+            return 'Task Details';
+        } else {
+            return 'Create Task';
+        }
+
+    }
+
     render() {
+        const { navigation } = this.props;
+        const taskId = navigation.getParam('id', '');
+        const isEdit = navigation.getParam('isEdit', false);
         return (
-            <View >
-                <Header
-                    centerComponent={{ text: '', style: styles.header }}
-                    backgroundColor="white"
-                    containerStyle={styles.headerContainer}
-                    statusBarProps={{ barStyle: 'dark-content' }}
-                />
-                {this.props.loading ? (
+                this.props.loading ? (
                     <LoadingIndicator />
                 ) : null
-                }
-            </View>
+                    
+            
         );
     }
 }
+
+{/* <Button title="Edit" onPress={() => {
+                    navigation.navigate('EditTask', {
+                        id: '86',
+                        isEdit: true,
+                    });
+                }} /> */}
 
 const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, tasks } }) => ({
     loading: taskOperationLoading,
