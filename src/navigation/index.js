@@ -12,11 +12,9 @@ import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen'
 import CalendarScreen from '../screens/CalendarScreen';
 import TaskListsScreen from '../screens/TaskListsScreen';
+import TaskDetailsScreen from '../screens/TaskDetailsScreen';
 
-/**
- * Create navigation that's only accessible once authenticated 
- */
-const AppNav = createBottomTabNavigator(
+const AppTabs = createBottomTabNavigator(
   {
     Home: HomeScreen,
     TaskLists: TaskListsScreen,
@@ -30,6 +28,17 @@ const AppNav = createBottomTabNavigator(
     })
   }
 );
+
+AppTabs.navigationOptions = {
+  header: null,
+}
+/**
+ * Create navigation that's only accessible once authenticated 
+ */
+const AppNav = createStackNavigator({
+  Tabs: AppTabs,
+  TaskDetails: TaskDetailsScreen
+});
 
 /**
  * Create navigation that's only accessible when unauthenticated
