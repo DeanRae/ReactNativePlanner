@@ -42,8 +42,7 @@ export const getAllTasks = () => (dispatch, getState) => {
             dispatch(tasksFetched(newTasks));
 
         })
-        .catch( error => {
-            console.log("error ", error.message);
+        .catch( error => {           
             dispatch(taskOperationError(error.message));
         });
 }
@@ -53,18 +52,18 @@ export const addTask = (task) => (dispatch, getState) => {
 
     const {auth} = getState();
     const user = {...auth.user};
+    const timestamp = serverTimestamp();
 
     let newTask = {};
 
     firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
-        .add({...task})
+        .add({...task, createdTimestamp: timestamp})
         .then(docRef => {
-            newTask = {...task, id: docRef.id};
+            newTask = {...task, id: docRef.id, createdTimestamp: timestamp};
             dispatch(taskAdded(newTask));
         })
-        .catch( error => {
-            console.log("error ", error.message);
+        .catch( error => {            
             dispatch(taskOperationError(error.message));
         });
 }
@@ -74,18 +73,19 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
 
     const {auth} = getState();
     const user = {...auth.user};
+    const timestamp = serverTimestamp();
 
     firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
         .doc(taskId)
         .update({
-            ...editedContents
+            ...editedContents,
+            updatedTimestamp: timestamp
         })
         .then(() => {
-            dispatch(taskModified({...editedContents}));
+            dispatch(taskModified({...editedContents, updatedTimestamp: timestamp}));
         })
-        .catch( error => {
-            console.log("error ", error.message);
+        .catch( error => {          
             dispatch(taskOperationError(error.message));
         });
 }
@@ -103,8 +103,7 @@ export const deleteTask = (taskId) => (dispatch, getState) => {
         .then(() => {
             dispatch(taskDeleted(taskId));
         })
-        .catch( error => {
-            console.log("error ", error.message);
+        .catch( error => {          
             dispatch(taskOperationError(error.message));
         });
 }
