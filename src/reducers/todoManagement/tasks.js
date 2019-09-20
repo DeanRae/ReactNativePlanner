@@ -31,7 +31,8 @@ const tasks = (state = initialState, action) => {
             return {
                 ...state,
                 tasks: {
-                    byId: { ...state.tasks.byId, [action.task.id]: {...editedTask, ...action.task} }, allIds: [...state.tasks.allIds]
+                    ...state.tasks,
+                    byId: { ...state.tasks.byId, [action.task.id]: {...editedTask, ...action.task} }
                 }, 
                 taskOperationLoading: false
             }
