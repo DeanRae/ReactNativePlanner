@@ -77,7 +77,14 @@ const styles = StyleSheet.create({
         elevation: 5,
         backgroundColor: '#fff'
     },
-
+    label: {
+        fontSize: 16,
+        color: '#86939e',
+        fontWeight: 'bold',
+    },
+    icon: {
+        color: '#43484d'
+    }
 });
 
 export default styles;
