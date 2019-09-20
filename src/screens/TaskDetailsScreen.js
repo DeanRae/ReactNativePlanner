@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import { SafeAreaView, ProgressViewIOS, Text, View,TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
-import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
+import { SafeAreaView, Text, View, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import { Header, Button, Input, Slider } from 'react-native-elements';
+import { Button, Input } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import styles from '../components/utils/globalStyles';
 import { createTitleFromFieldName } from '../components/utils/textTransformations';
-import Icon from 'react-native-vector-icons/Ionicons';
 import ProgressBar from '../components/ProgressBar';
+import Picker from '../components/Picker';
 
 const initState = {
     completionRate: 0,
     title: '',
     location: '',
+    taskList: '',
+    taskListDialog: false,
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -35,7 +36,7 @@ class TaskDetailsScreen extends Component {
             favSport1: null,
             lastTextInput: null,
             favSport5: null,
-          };
+        };
 
         this.state = {
             ...initState
@@ -92,6 +93,10 @@ class TaskDetailsScreen extends Component {
         );
     }
 
+    toggleTaskListInputDialog = () => {
+        this.setState({ taskListDialog: !this.state.taskListDialog });
+    }
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
@@ -107,29 +112,6 @@ class TaskDetailsScreen extends Component {
                 >
                     <SafeAreaView style={styles.centered}>
                         <Input
-                            label='List'
-                            containerStyle={styles.formComponent}
-                            onChangeText={newInput => {
-                                this.setState({ title: newInput })
-                            }}
-                            clearButtonMode='while-editing'
-                            rightIcon={{ type: 'ionicon', name: 'ios-arrow-down', color: '#43484d' }}
-                        />
-                        <View>
-                            <Text></Text>
-                            <RNPickerSelect
-                                items={[
-                                    { label: 'Football', value: 'football' },
-                                    { label: 'Baseball', value: 'baseball' },
-                                    { label: 'Hockey', value: 'hockey' },
-                                ]}
-                                onValueChange={(value) => console.log(value)}
-                                InputAccessoryView={this.inputAccessoryView}
-                                
-                                Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' /> }}
-                            />
-                        </View>
-                        <Input
                             label='Title *'
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
@@ -142,6 +124,22 @@ class TaskDetailsScreen extends Component {
                             onChangeText={newInput => {
                                 this.setState({ location: newInput })
                             }}
+                        />
+                        <Picker
+                            placeholder={{ label: 'Select a task list...', value: '' }}
+                            label='List'
+                            value={this.state.taskList}
+                            onChangeFunc={(value) => {
+                                this.setState({ ["taskList"]: value });
+                            }}
+                            inputAccessoryLabel='Select A Task List'
+                            buttonName='Add New Task List'
+                            buttonFunc={() => { this.toggleTaskListInputDialog }}
+                            options={[
+                                { label: 'Football', value: 'football' },
+                                { label: 'Baseball', value: 'baseball' },
+                                { label: 'Hockey', value: 'hockey' },
+                            ]}
                         />
                         <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
                         <ProgressBar disabled value={this.state.completionRate} />
