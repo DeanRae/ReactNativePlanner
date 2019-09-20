@@ -3,7 +3,8 @@ import * as types from '../../actions/todoManagement/actionTypes';
 const initialState = {
     tasks: {
         byId: {},
-        allIds: []
+        allIds: [],
+        subtasks: {}
     },
     taskOperationLoading: false,
     taskOperationError: null
@@ -25,6 +26,7 @@ const tasks = (state = initialState, action) => {
         case types.TASK_OPERATION_ERROR:
             return { ...state, taskOperationError: action.error, taskOperationLoading: false };
         case types.TASK_MODIFIED:
+            // add nethod to deal with subtasks for this and deleted.
             const editedTask = {...state.tasks.byId[action.task.id]};
             return {
                 ...state,
