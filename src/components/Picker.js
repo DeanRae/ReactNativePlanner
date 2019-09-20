@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, ViewPropTypes } from 'react-native';
+import { View, ViewPropTypes, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
 import PropTypes from 'prop-types';
 import styles from '../components/utils/globalStyles';
 
@@ -10,17 +11,23 @@ import styles from '../components/utils/globalStyles';
  * used as a button on the side.
  */
 export default class Picker extends Component {
-    
+
     render() {
-        
+
     }
 }
 
 Picker.propTypes = {
     label: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    options: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+        }).isRequired
+    ).isRequired,
+    value: PropTypes.string.isRequired,
     onChangeFunc: PropTypes.func.isRequired,
-    buttonIconName: PropTypes.string,
+    buttonName: PropTypes.string,
     buttonFunc: PropTypes.func,
     style: ViewPropTypes.style
 }
