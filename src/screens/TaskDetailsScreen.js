@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { SafeAreaView, ProgressViewIOS, Text, View } from 'react-native';
+import { SafeAreaView, ProgressViewIOS, Text, View,TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
 import { connect } from 'react-redux';
 import { Header, Button, Input, Slider } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -7,9 +8,10 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import styles from '../components/utils/globalStyles';
 import { createTitleFromFieldName } from '../components/utils/textTransformations';
+import Icon from 'react-native-vector-icons/Ionicons';
 import ProgressBar from '../components/ProgressBar';
 
-const initState ={
+const initState = {
     completionRate: 0,
     title: '',
     location: '',
@@ -26,6 +28,14 @@ class TaskDetailsScreen extends Component {
         super(props);
 
         const params = this.getNavParams(props.navigation);
+
+        this.inputRefs = {
+            firstTextInput: null,
+            favSport0: null,
+            favSport1: null,
+            lastTextInput: null,
+            favSport5: null,
+          };
 
         this.state = {
             ...initState
@@ -65,6 +75,23 @@ class TaskDetailsScreen extends Component {
 
     }
 
+    inputAccessoryView = () => {
+        return (
+            <View style={defaultStyles.modalViewMiddle}>
+                <Text>Select A Task List</Text>
+                <TouchableOpacity
+                    onPress={() => {
+                        console.log("add new list pressed");
+                    }}
+                    hitSlop={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                    <View>
+                        <Text style={defaultStyles.done}>Add New List</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
@@ -80,21 +107,45 @@ class TaskDetailsScreen extends Component {
                 >
                     <SafeAreaView style={styles.centered}>
                         <Input
+                            label='List'
+                            containerStyle={styles.formComponent}
+                            onChangeText={newInput => {
+                                this.setState({ title: newInput })
+                            }}
+                            clearButtonMode='while-editing'
+                            rightIcon={{ type: 'ionicon', name: 'ios-arrow-down', color: '#43484d' }}
+                        />
+                        <View>
+                            <Text></Text>
+                            <RNPickerSelect
+                                items={[
+                                    { label: 'Football', value: 'football' },
+                                    { label: 'Baseball', value: 'baseball' },
+                                    { label: 'Hockey', value: 'hockey' },
+                                ]}
+                                onValueChange={(value) => console.log(value)}
+                                InputAccessoryView={this.inputAccessoryView}
+                                
+                                Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' /> }}
+                            />
+                        </View>
+                        <Input
                             label='Title *'
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
-                                this.setState({title: newInput})
+                                this.setState({ title: newInput })
                             }}
                         />
-                         <Input
+                        <Input
                             label='Location'
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
-                                this.setState({location: newInput})
+                                this.setState({ location: newInput })
                             }}
                         />
                         <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
                         <ProgressBar disabled value={this.state.completionRate} />
+
 
                     </SafeAreaView>
                 </KeyboardAwareScrollView>

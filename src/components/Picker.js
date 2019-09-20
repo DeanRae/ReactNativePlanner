@@ -12,8 +12,49 @@ import styles from '../components/utils/globalStyles';
  */
 export default class Picker extends Component {
 
-    render() {
+    constructor(props) {
+        super(props);
 
+        this.inputRefs = {
+            picker: null
+        };
+    }
+    /**
+     * Renders a label on the right side and a text button on the left side
+     * of the bar above the picker.
+     */
+    inputAccessoryView = () => {
+
+        const { inputAccessoryLabel, buttonName, buttonFunc } = this.props;
+
+        return (
+            <View style={defaultStyles.modalViewMiddle}>
+                <Text>{inputAccessoryLabel}</Text>
+                <TouchableOpacity
+                    onPress={() => {
+                        buttonFunc();
+                    }}
+                    hitSlop={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                    <View>
+                        <Text style={defaultStyles.done}>{buttonName}</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    render() {
+        const {label, options, value, onChangeFunc, style } = this.props;
+        return (
+            
+            <RNPickerSelect
+                items={options}
+                onValueChange={(value) => onChangeFunc(value)}
+                InputAccessoryView={this.inputAccessoryView}
+                value={value}
+                Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' /> }}
+            />
+        );
     }
 }
 
@@ -27,6 +68,7 @@ Picker.propTypes = {
     ).isRequired,
     value: PropTypes.string.isRequired,
     onChangeFunc: PropTypes.func.isRequired,
+    inputAccessoryLabel: PropTypes.string.isRequired,
     buttonName: PropTypes.string,
     buttonFunc: PropTypes.func,
     style: ViewPropTypes.style
