@@ -97,6 +97,37 @@ class TaskDetailsScreen extends Component {
         this.setState({ taskListDialog: !this.state.taskListDialog });
     }
 
+    renderTaskListPickerAndDialog = () => {
+        return (
+            <Picker
+                placeholder={{ label: 'Select a task list...', value: '' }}
+                label='List'
+                value={this.state.taskList}
+                onChangeFunc={(value) => {
+                    this.setState({ ["taskList"]: value });
+                }}
+                inputAccessoryLabel='Select A Task List'
+                buttonName='Add New Task List'
+                buttonFunc={() => { this.toggleTaskListInputDialog }}
+                options={[
+                    { label: 'Football', value: 'football' },
+                    { label: 'Baseball', value: 'baseball' },
+                    { label: 'Hockey', value: 'hockey' },
+                ]}
+            />
+            <InputDialog
+            title="Add New Task List"
+            inputs={{ listTitle: ''}}
+            isVisible={this.state.taskListDialog}
+            onSaveFunc={() => { 
+              this.toggleTaskListInputDialog(); 
+              this.props.updateUserEmail(this.state["email"], this.state["password"]); }}
+            onChangeFunc={this.handleInputChange}
+            onCancelFunc={this.handleCancel}
+          />
+        );
+    }
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
@@ -125,22 +156,7 @@ class TaskDetailsScreen extends Component {
                                 this.setState({ location: newInput })
                             }}
                         />
-                        <Picker
-                            placeholder={{ label: 'Select a task list...', value: '' }}
-                            label='List'
-                            value={this.state.taskList}
-                            onChangeFunc={(value) => {
-                                this.setState({ ["taskList"]: value });
-                            }}
-                            inputAccessoryLabel='Select A Task List'
-                            buttonName='Add New Task List'
-                            buttonFunc={() => { this.toggleTaskListInputDialog }}
-                            options={[
-                                { label: 'Football', value: 'football' },
-                                { label: 'Baseball', value: 'baseball' },
-                                { label: 'Hockey', value: 'hockey' },
-                            ]}
-                        />
+                        this.renderTaskListPickerAndDialog()
                         <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
                         <ProgressBar disabled value={this.state.completionRate} />
 
