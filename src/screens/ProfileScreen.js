@@ -49,7 +49,7 @@ class ProfileScreen extends Component {
   componentDidUpdate = (prevProps) => {
 
     if (!this.props.restoring && !this.props.logged && !this.props.loading) {
-      this.props.navigation.navigate('AuthLoading');
+      this.props.navigation.navigate('Auth');
     }
 
     if (this.props.error) {

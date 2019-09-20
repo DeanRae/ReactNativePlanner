@@ -12,7 +12,7 @@ import styles from '../components/utils/globalStyles';
 export default class Picker extends Component {
     
     render() {
-
+        
     }
 }
 
