@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, ViewPropTypes, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
 import PropTypes from 'prop-types';
 import styles from '../components/utils/globalStyles';
@@ -44,16 +45,24 @@ export default class Picker extends Component {
     }
 
     render() {
-        const {label, options, value, onChangeFunc, style } = this.props;
+        const { label, options, value, onChangeFunc, placeholder, inputAccessoryLabel, buttonName, buttonFunc } = this.props;
         return (
-            
-            <RNPickerSelect
-                items={options}
-                onValueChange={(value) => onChangeFunc(value)}
-                InputAccessoryView={this.inputAccessoryView}
-                value={value}
-                Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' /> }}
-            />
+            <View style={styles.pickerContainer}>
+                <Text style={styles.label}>{label}</Text>
+                <RNPickerSelect
+                    placeholder={{ ...placeholder, color: '#9EA0A4' }}
+                    items={options}
+                    onValueChange={(value) => onChangeFunc(value)}
+                    InputAccessoryView={
+                        inputAccessoryLabel && buttonName && buttonFunc ?
+                        this.inputAccessoryView : 
+                        null
+                    }
+                    value={value}
+                    style={styles}
+                    Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' size={24} /> }}
+                />
+            </View>
         );
     }
 }
@@ -71,5 +80,8 @@ Picker.propTypes = {
     inputAccessoryLabel: PropTypes.string.isRequired,
     buttonName: PropTypes.string,
     buttonFunc: PropTypes.func,
-    style: ViewPropTypes.style
+    placeholder: PropTypes.exact({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.any.isRequired
+    }),
 }
