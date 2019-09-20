@@ -82,9 +82,24 @@ const styles = StyleSheet.create({
         color: '#86939e',
         fontWeight: 'bold',
     },
-    icon: {
-        color: '#43484d'
-    }
+    // Picker Styles
+    pickerContainer: {
+        margin: 10,
+        marginBottom: 30
+    },
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderBottomColor: '#86939e',
+        borderBottomWidth: 1,
+        color: 'black',
+        paddingRight: 30,
+    },
+    iconContainer: {
+        top: 10,
+        right: 12,
+    },
 });
 
 export default styles;
