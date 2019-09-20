@@ -2,110 +2,100 @@ import { firestore, serverTimestamp } from "../../services/firebase";
 import * as types from './actionTypes';
 
 export const getAllTaskLists = () => (dispatch, getState) => {
-    dispatch(taskOperationLoading());
+    dispatch(listOperationLoading());
 
     const {auth} = getState();
     const user = {...auth.user};
     
-    console.log("in get all tasks ", user);
-    let newTasks = {
+    let newLists = {
         byId: {},
         allIds: []
     };
 
     firestore()
-        .collection(`/userProfile/${user.uid}/tasks`)
+        .collection(`/userProfile/${user.uid}/taskLists`)
         .get()
-        .then(allTasks => {
-            if (!allTasks.empty) {
-                allTasks.forEach(task => {
-                    let taskData = task.data();
-                    newTasks.byId[task.id] = {
-                        id: task.id,
-                        title: taskData.title,
-                        description: taskData.description,
-                        location: taskData.location,
-                        listId: taskData.listId,
-                        startTime: taskData.startTime,
-                        endTime: taskData.endTime,
-                        allDay: taskData.allDay,
-                        completionRate: taskData.completionRate,
-                        isCompleted: taskData.isCompleted,
-                        createdTimestamp: taskData.createdTimestamp,
-                        updatedTimestamp: taskData.updatedTimestamp
+        .then(allLists => {
+            if (!allLists.empty) {
+                allLists.forEach(list => {
+                    let listData = list.data();
+                    newLists.byId[list.id] = {
+                        id: list.id,
+                        title: listData.title,
+                        createdTimestamp: listData.createdTimestamp,
+                        updatedTimestamp: listData.updatedTimestamp
                     };
 
-                    newTasks.allIds.push(task.id);
+                    newLists.allIds.push(list.id);
                 });
             }
 
-            dispatch(tasksFetched(newTasks));
+            dispatch(listsFetched(newLists));
 
         })
-        .catch( error => {
-            console.log("error ", error.message);
-            dispatch(taskOperationError(error.message));
+        .catch( error => {          
+            dispatch(listOperationError(error.message));
         });
 }
 
-export const addTask = (task) => (dispatch, getState) => {
-    dispatch(taskOperationLoading());
+export const addList = (list) => (dispatch, getState) => {
+    dispatch(listOperationLoading());
 
     const {auth} = getState();
     const user = {...auth.user};
+    const timestamp = serverTimestamp();
 
-    let newTask = {};
+    let newList = {};
 
     firestore()
-        .collection(`/userProfile/${user.uid}/tasks`)
-        .add({...task})
+        .collection(`/userProfile/${user.uid}/taskLists`)
+        .add({...list, createdTimestamp: timestamp})
         .then(docRef => {
-            newTask = {...task, id: docRef.id};
-            dispatch(taskAdded(newTask));
+            newList = {...list, id: docRef.id, createdTimestamp: timestamp};
+            dispatch(listAdded(newList));
         })
-        .catch( error => {
-            console.log("error ", error.message);
-            dispatch(taskOperationError(error.message));
+        .catch( error => {           
+            dispatch(listOperationError(error.message));
         });
 }
 
-export const editTask = (taskId, editedContents) => (dispatch, getState) => {
-    dispatch(taskOperationLoading());
+export const editList = (listId, editedContents) => (dispatch, getState) => {
+    dispatch(listOperationLoading());
 
     const {auth} = getState();
     const user = {...auth.user};
+    const timestamp = serverTimestamp();
 
     firestore()
-        .collection(`/userProfile/${user.uid}/tasks`)
-        .doc(taskId)
+        .collection(`/userProfile/${user.uid}/taskLists`)
+        .doc(listId)
         .update({
-            ...editedContents
+            ...editedContents,
+            updatedTimestamp: timestamp
         })
         .then(() => {
-            dispatch(taskModified({...editedContents}));
+            dispatch(listModified({...editedContents, updatedTimestamp: timestamp}));
         })
-        .catch( error => {
-            console.log("error ", error.message);
-            dispatch(taskOperationError(error.message));
+        .catch( error => {           
+            dispatch(listOperationError(error.message));
         });
 }
 
-export const deleteTask = (taskId) => (dispatch, getState) => {
-    dispatch(taskOperationLoading());
+export const deleteList = (listId) => (dispatch, getState) => {
+    dispatch(listOperationLoading());
 
     const {auth} = getState();
     const user = {...auth.user};
 
     firestore()
-        .collection(`/userProfile/${user.uid}/tasks`)
-        .doc(taskId)
+        .collection(`/userProfile/${user.uid}/taskLists`)
+        .doc(listId)
         .delete()
         .then(() => {
-            dispatch(taskDeleted(taskId));
+            dispatch(listDeleted(taskId));
         })
-        .catch( error => {
-            console.log("error ", error.message);
-            dispatch(taskOperationError(error.message));
+        .catch( error => {           
+            dispatch(listOperationError(error.message));
         });
 }
 
@@ -114,33 +104,33 @@ export const errorDisplayed = () => dispatch => {
 }
 
 
-const tasksFetched = tasks => ({
-    type: types.TASKS_FETCHED,
-    tasks
+const listsFetched = lists => ({
+    type: types.LISTS_FETCHED,
+    lists
 });
 
-const taskModified = task => ({
-    type: types.TASK_MODIFIED,
-    task
+const listModified = list => ({
+    type: types.LIST_MODIFIED,
+    list
 });
 
-const taskAdded = task => ({
-    type: types.TASK_ADDED,
-    task
+const listAdded = list => ({
+    type: types.LIST_ADDED,
+    list
 })
 
-const taskDeleted = taskId => ({
-    type: types.TASK_DELETION_SUCCESS,
-    taskId
+const listDeleted = listId => ({
+    type: types.LIST_DELETION_SUCCESS,
+    listId
 });
 
-const taskOperationError = error => ({
-    type: types.TASK_OPERATION_ERROR,
+const listOperationError = error => ({
+    type: types.LIST_OPERATION_ERROR,
     error
 });
 
-const taskOperationLoading = () => ({
-    type: types.TASK_OPERATION_LOADING
+const listOperationLoading = () => ({
+    type: types.LIST_OPERATION_LOADING
 });
 
 const errorAcknowledged = () => ({
