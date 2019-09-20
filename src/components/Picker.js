@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ViewPropTypes, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { View, ViewPropTypes, Text, TouchableWithoutFeedback, TouchableOpacity, TextInput, InputAccessoryView, Dimensions, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
 import PropTypes from 'prop-types';
@@ -19,6 +19,10 @@ export default class Picker extends Component {
         this.inputRefs = {
             picker: null
         };
+
+        this.state = {
+            text: ''
+        }
     }
     /**
      * Renders a label on the right side and a text button on the left side
@@ -29,8 +33,13 @@ export default class Picker extends Component {
         const { inputAccessoryLabel, buttonName, buttonFunc } = this.props;
 
         return (
+
             <View style={defaultStyles.modalViewMiddle}>
-                <Text>{inputAccessoryLabel}</Text>
+                <View style={styles.pickerInputAccessory} >
+                    <TextInput style={{
+                        paddingLeft: 10,
+                    }} placeholder="Add new task list..." onChangeText={(newInput) => { this.setState({ text: newInput }) }} autoCorrect={false} />
+                </View>
                 <TouchableOpacity
                     onPress={() => {
                         buttonFunc();
@@ -41,6 +50,12 @@ export default class Picker extends Component {
                     </View>
                 </TouchableOpacity>
             </View>
+
+
+
+
+
+
         );
     }
 
@@ -55,8 +70,8 @@ export default class Picker extends Component {
                     onValueChange={(value) => onChangeFunc(value)}
                     InputAccessoryView={
                         inputAccessoryLabel && buttonName && buttonFunc ?
-                        this.inputAccessoryView : 
-                        null
+                            this.inputAccessoryView :
+                            null
                     }
                     value={value}
                     style={styles}
