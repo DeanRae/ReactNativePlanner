@@ -4,7 +4,8 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { Calendar } from "react-native-calendars";
 import calendarTheme from '../screens/Calendar/calendarTheme';
 import calStyles from "../screens/Calendar/calendarStyle";
-import getNZDateTime, { get12HrTime } from "./utils/getNZDateTime";
+import getNZDateTime, { get12HrTime , getDateString } from "./utils/getNZDateTime";
+import Icon from 'react-native-vector-icons/Ionicons';
 
 
 export default class DateTimePickerTester extends Component {
@@ -61,7 +62,8 @@ export default class DateTimePickerTester extends Component {
     render() {
         const {currentDate} = this.props;
         const curDateObj = new Date(currentDate);
-
+        const date = getDateString(curDateObj);
+        
         return (
             <>
                 <Button title="Show DatePicker" onPress={this.toggleDateTimePicker} />
@@ -81,33 +83,37 @@ export default class DateTimePickerTester extends Component {
                         <View style={{
                             height: 50,
                             flexDirection: 'row',
-                            justifyContent: 'space-between',
+                            justifyContent: 'center',
                             alignItems: 'center',
                             paddingHorizontal: 10,
                             backgroundColor: '#EFF1F2',
                             borderTopWidth: 0.5,
                             borderTopColor: '#919498',
                             zIndex: 2,
-                        }} />
+                        }}>
+                            <Text>Select date and time</Text>
+                        </View>
                         <Calendar
                             theme={calendarTheme}
                             style={calStyles.calendar}
-                            current={curDateObj}
+                            current={date}
                             onDayPress={this.handleDatePicked}
                             monthFormat={'d MMMM yyyy'}
                             firstDay={1}
                             onPressArrowLeft={substractMonth => substractMonth()}
                             onPressArrowRight={addMonth => addMonth()}
-                            markedDates={{ [curDateObj]: { selected: true, disableTouchEvent: true } }}
+                            markedDates={{ [date]: { selected: true, disableTouchEvent: true } }}
                         />
                            
                         <TouchableOpacity onPress={this.toggleTimePicker}>
-                        <View  style={{backgroundColor: 'white', height: 44, margin: 20 }}>
-                            <Text>Time: {get12HrTime(currentDate)}</Text>
+                        <View  style={{backgroundColor:'#EFF1F2', borderWidth: 0.5, borderColor:'#919498', height: 44, width: 200, margin: 20, marginLeft: 30, justifyContent:'center', paddingLeft: 10, flexDirection:'row', alignItems:'center'}}>
+                            <Text style={{fontWeight: 'bold', fontSize: 16, }}>Time: {get12HrTime(currentDate)}</Text>
+                            <Icon name='ios-arrow-down' color='#43484d' size={20} style={{paddingLeft: 10}}/>
                             </View>
                         </TouchableOpacity>
                         <DateTimePicker
                             mode='time'
+                            titleIOS='Pick a time'
                             date={curDateObj}
                             isVisible={this.state.isTimePickerVisible}
                             onConfirm={this.handleTimePicked}
