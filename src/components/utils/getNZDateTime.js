@@ -1,3 +1,7 @@
+const months = ["January", "February", "March",
+    "April", "May", "June", "July",
+    "August", "September", "October",
+    "November", "December"];
 /**
  * Returns NZ ISO Date when given a javascript date object.
  */
@@ -5,9 +9,9 @@ export default getNZDateTime = (date) => {
     const isoDate = date.toISOString();
     const tIndex = isoDate.indexOf('T');
     const hr = isoDate.slice(tIndex + 1, tIndex + 3);
-    const extractedTime = getNZHour(hr) + isoDate.slice(tIndex + 3, tIndex+6) + "+12:00";
+    const extractedTime = getNZHour(hr) + isoDate.slice(tIndex + 3, tIndex + 6) + "+12:00";
 
-    return (isoDate.slice(0, tIndex+1) + extractedTime);
+    return (isoDate.slice(0, tIndex + 1) + extractedTime);
 }
 
 /**
@@ -18,7 +22,7 @@ export default getNZDateTime = (date) => {
 export const get12HrTime = (date) => {
     const tIndex = date.indexOf('T');
     const plusIndex = date.indexOf('+');
-    const min = date.slice(tIndex+4, plusIndex);
+    const min = date.slice(tIndex + 4, plusIndex);
     const hr = date.slice(tIndex + 1, tIndex + 3);
 
     if (+hr > 12) {
@@ -27,7 +31,7 @@ export const get12HrTime = (date) => {
     } else if (+hr < 12 && +hr > 0) {
         return date.slice(tIndex + 1, plusIndex) + " am";
     } else {
-        return hr == '12' ? "12:" + min + " pm":"12:" + min + " am";
+        return hr == '12' ? "12:" + min + " pm" : "12:" + min + " am";
     }
 }
 
@@ -38,7 +42,14 @@ export const getDateString = (date) => {
     const dd = String(date.getDate()).padStart(2, '0');
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const yyyy = date.getFullYear();
-    return yyyy+ '-' + mm + '-' + dd;
+    return yyyy + '-' + mm + '-' + dd;
+}
+
+export const getFriendlyDateString = (date) => {
+    const d = date.getDate();
+    const m = months[date.getMonth()] ;
+    const y = date.getFullYear();
+    return d + " " + m + " " + y;
 }
 
 /**
@@ -52,7 +63,7 @@ const getNZHour = (hr) => {
         return (+hr + 12);
     } else if (+hr >= 13 && +hr <= 23) {
         const time = (+hr - 12).toString();
-        return time.length < 2? "0"+time : time;
+        return time.length < 2 ? "0" + time : time;
     } else if (hr == 12) {
         return '00';
     } else {
