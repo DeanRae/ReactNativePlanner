@@ -5,17 +5,23 @@ import { Button, Input } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
+import { addList } from '../actions/todoManagement/taskLists';
 import styles from '../components/utils/globalStyles';
 import { createTitleFromFieldName } from '../components/utils/textTransformations';
 import ProgressBar from '../components/ProgressBar';
 import Picker from '../components/Picker';
+import DateTimePicker from '../components/DateTimePicker/DateTimePicker';
+import getNZDateTime from '../components/utils/getNZDateTime';
 
 const initState = {
     completionRate: 0,
     title: '',
     location: '',
     taskList: '',
+    newTaskList: '',
     taskListDialog: false,
+    startDate: getNZDateTime(new Date()),
+    endDate: getNZDateTime(new Date()),
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -41,10 +47,12 @@ class TaskDetailsScreen extends Component {
         this.state = {
             ...initState
         }
+
+        console.log("the state", this.state);
     }
 
     componentDidUpdate = (prevProps) => {
-
+        console.log("state", this.state);
         if (this.props.error) {
             Alert.alert(
                 'Error',
@@ -99,32 +107,25 @@ class TaskDetailsScreen extends Component {
 
     renderTaskListPickerAndDialog = () => {
         return (
-            <Picker
-                placeholder={{ label: 'Select a task list...', value: '' }}
-                label='List'
-                value={this.state.taskList}
-                onChangeFunc={(value) => {
-                    this.setState({ ["taskList"]: value });
-                }}
-                inputAccessoryLabel='Select A Task List'
-                buttonName='Add New Task List'
-                buttonFunc={() => { this.toggleTaskListInputDialog }}
-                options={[
-                    { label: 'Football', value: 'football' },
-                    { label: 'Baseball', value: 'baseball' },
-                    { label: 'Hockey', value: 'hockey' },
-                ]}
-            />
-            <InputDialog
-            title="Add New Task List"
-            inputs={{ listTitle: ''}}
-            isVisible={this.state.taskListDialog}
-            onSaveFunc={() => { 
-              this.toggleTaskListInputDialog(); 
-              this.props.updateUserEmail(this.state["email"], this.state["password"]); }}
-            onChangeFunc={this.handleInputChange}
-            onCancelFunc={this.handleCancel}
-          />
+            <View>
+                <Picker
+                    placeholder={{ label: 'Select a task list...', value: '' }}
+                    label='List'
+                    value={this.state.taskList}
+                    onChangeFunc={(value) => {
+                        this.setState({ ["taskList"]: value });
+                    }}
+                    inputAccessoryLabel='Select A Task List'
+                    buttonName='Add New Task List'
+                    buttonFunc={() => { this.toggleTaskListInputDialog() }}
+                    options={[
+                        { label: 'Football', value: 'football' },
+                        { label: 'Baseball', value: 'baseball' },
+                        { label: 'Hockey', value: 'hockey' },
+                    ]}
+                />
+
+            </View>
         );
     }
 
@@ -156,11 +157,17 @@ class TaskDetailsScreen extends Component {
                                 this.setState({ location: newInput })
                             }}
                         />
-                        this.renderTaskListPickerAndDialog()
+                        {this.renderTaskListPickerAndDialog()}
+                        <DateTimePicker currentDate={this.state.startDate} onDayPress={(date)=>{this.setState({startDate: date})}}
+                        onTimeConfirm={(date)=>{this.setState({startDate: date})}}
+                        label = "Start Date and Time"
+                        />
+                        <DateTimePicker currentDate={this.state.endDate} onDayPress={(date)=>{this.setState({endDate: date})}}
+                        onTimeConfirm={(date)=>{this.setState({endDate: date})}}
+                        label = "End Date and Time"
+                        />
                         <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
                         <ProgressBar disabled value={this.state.completionRate} />
-
-
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
 
@@ -188,7 +195,8 @@ const mapDispatchToProps = {
     addTask,
     deleteTask,
     editTask,
-    errorDisplayed
+    errorDisplayed,
+    addList
 };
 
 export default connect(
