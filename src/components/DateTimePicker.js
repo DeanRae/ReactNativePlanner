@@ -4,7 +4,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { Calendar } from "react-native-calendars";
 import calendarTheme from '../screens/Calendar/calendarTheme';
 import calStyles from "../screens/Calendar/calendarStyle";
-import getNZDateTime from "./utils/getNZDateTime";
+import getNZDateTime, { get12HrTime } from "./utils/getNZDateTime";
 
 
 export default class DateTimePickerTester extends Component {
@@ -55,11 +55,12 @@ export default class DateTimePickerTester extends Component {
         const newDate = currentDate.slice(0, tIndex+1) + extractedTime;
 
         this.props.onTimeConfirm(newDate);
+        this.toggleTimePicker();
     }
 
     render() {
         const {currentDate} = this.props;
-        const calDate = new Date(currentDate);
+        const curDateObj = new Date(currentDate);
 
         return (
             <>
@@ -91,24 +92,23 @@ export default class DateTimePickerTester extends Component {
                         <Calendar
                             theme={calendarTheme}
                             style={calStyles.calendar}
-                            current={calDate}
+                            current={curDateObj}
                             onDayPress={this.handleDatePicked}
                             monthFormat={'d MMMM yyyy'}
                             firstDay={1}
                             onPressArrowLeft={substractMonth => substractMonth()}
                             onPressArrowRight={addMonth => addMonth()}
-                            markedDates={{ [calDate]: { selected: true, disableTouchEvent: true } }}
+                            markedDates={{ [curDateObj]: { selected: true, disableTouchEvent: true } }}
                         />
-                       
-
-                       
+                           
                         <TouchableOpacity onPress={this.toggleTimePicker}>
                         <View  style={{backgroundColor: 'white', height: 44, margin: 20 }}>
-                            <Text>Time: </Text>
+                            <Text>Time: {get12HrTime(currentDate)}</Text>
                             </View>
                         </TouchableOpacity>
                         <DateTimePicker
                             mode='time'
+                            date={curDateObj}
                             isVisible={this.state.isTimePickerVisible}
                             onConfirm={this.handleTimePicked}
                             onCancel={this.toggleTimePicker}
