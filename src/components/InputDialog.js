@@ -5,6 +5,21 @@ import Dialog from "react-native-dialog";
 import {createTitleFromFieldName} from './utils/textTransformations';
 
 export default class InputDialog extends Component {
+
+    returnAutoCompleteType = (field) => {
+        switch (field) {
+            case 'password':
+            case 'confirmPassword':
+                return 'password';
+            case 'name':
+                return 'name';
+            case 'email':
+                return 'email';
+            default: 
+                return 'off';
+        }
+    }
+    
     render() {
         return (
             <View>
@@ -16,7 +31,7 @@ export default class InputDialog extends Component {
                         return <Dialog.Input
                             label={createTitleFromFieldName(field[0])}
                             secureTextEntry={isPassword}
-                            autoCompleteType={isPassword ? 'password' : field[0]}
+                            autoCompleteType={this.returnAutoCompleteType(field[0])}
                             autoFocus={key==0 ? true :false}
                             onChangeText={newInput => {
                                 this.props.onChangeFunc(field[0], newInput);
