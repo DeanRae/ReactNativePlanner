@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { Button, View, Modal, TouchableOpacity, Text } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { Calendar } from "react-native-calendars";
-import calendarTheme from '../screens/Calendar/calendarTheme';
-import calStyles from "../screens/Calendar/calendarStyle";
-import getNZDateTime, { get12HrTime , getDateString } from "./utils/getNZDateTime";
+import calendarTheme from '../../screens/Calendar/calendarTheme';
+import calStyles from "../../screens/Calendar/calendarStyle";
+import getNZDateTime, { get12HrTime , getDateString } from "../utils/getNZDateTime";
 import Icon from 'react-native-vector-icons/Ionicons';
 
 
