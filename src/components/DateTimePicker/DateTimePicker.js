@@ -4,7 +4,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { Calendar } from "react-native-calendars";
 import calendarTheme from '../../screens/Calendar/calendarTheme';
 import calStyles from "../../screens/Calendar/calendarStyle";
-import getNZDateTime, { get12HrTime, getDateString } from "../utils/getNZDateTime";
+import getNZDateTime, { get12HrTime, getDateString, getFriendlyDateString } from "../utils/getNZDateTime";
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from "./dtpStyles";
 
@@ -112,12 +112,12 @@ export default class DateTimePickerTester extends Component {
     /**
      * Renders a time picker and its "button".
      */
-    renderTimePicker = (currentDate, curDateObj) => {
+    renderTimePicker = (time, curDateObj) => {
         return (
             <>
                 <TouchableOpacity onPress={this.toggleTimePicker}>
                     <View style={styles.timeLabelContainer}>
-                        <Text style={styles.timeText}>Time: {get12HrTime(currentDate)}</Text>
+                        <Text style={styles.timeText}>Time: {time}</Text>
                         <Icon name='ios-arrow-down' color='#43484d' size={20} style={styles.timeArrowIcon} />
                     </View>
                 </TouchableOpacity>
@@ -133,28 +133,38 @@ export default class DateTimePickerTester extends Component {
         )
     }
 
+    renderDateTimePickerButton = (displayDate, time) => {
+        if (!this.state.isDateTimePickerVisible) {
+            return (<TouchableOpacity style={styles.pickerButton} onPress={this.toggleDateTimePicker}>
+                <Text style={styles.pickerLabel}>{this.props.label}</Text>
+                <Text style={styles.pickerButtonText}>{displayDate} {time}</Text>
+            </TouchableOpacity>);
+        } else { return null }
+    }
+
     render() {
         const { currentDate } = this.props;
         const curDateObj = new Date(currentDate);
         const date = getDateString(curDateObj);
+        const time = get12HrTime(currentDate);
+        const displayDate = getFriendlyDateString(curDateObj);
 
         return (
             <>
-                <Button title="Show DatePicker" onPress={this.toggleDateTimePicker} />
-                <View style={styles.modalContainer}>
+                {this.renderDateTimePickerButton(displayDate, time)}
 
-                    <Modal
-                        animationType="slide"
-                        transparent
-                        visible={this.state.isDateTimePickerVisible}
-                    >
-
-                        {this.renderModalHeader()}
-                        {this.renderCalendarPicker(date)}
-                        {this.renderTimePicker(currentDate, curDateObj)}
-
-                    </Modal>
-                </View>
+                {this.state.isDateTimePickerVisible ?
+                    <View style={styles.modalContainer}>
+                        <Modal
+                            animationType="slide"
+                            transparent
+                            visible={this.state.isDateTimePickerVisible}
+                        >
+                            {this.renderModalHeader()}
+                            {this.renderCalendarPicker(date)}
+                            {this.renderTimePicker(time, curDateObj)}
+                        </Modal>
+                    </View> : null}
             </>
         );
     }
