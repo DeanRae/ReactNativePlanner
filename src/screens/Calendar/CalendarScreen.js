@@ -157,14 +157,14 @@ class CalendarScreen extends Component {
                                 firstDay={1}
                                 markedDates={this.getMarkedDates()}
                                 theme={calendarTheme}
-                                calendarStyle={styles.calendar}
-                                headerStyle={styles.calendar} 
+                                calendarStyle={calStyles.calendar}
+                                headerStyle={calStyles.calendar} 
                             />
                             <AgendaList
                                 sections={ITEMS}
                                 extraData={this.state}
                                 renderItem={this.renderItem}
-                                sectionStyle={styles.section}
+                                sectionStyle={calStyles.section}
                             />
                         </CalendarProvider>
                     )}
