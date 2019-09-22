@@ -22,6 +22,7 @@ const initState = {
     taskListDialog: false,
     startDate: getNZDateTime(new Date()),
     endDate: getNZDateTime(new Date()),
+    description: ''
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -35,14 +36,6 @@ class TaskDetailsScreen extends Component {
         super(props);
 
         const params = this.getNavParams(props.navigation);
-
-        this.inputRefs = {
-            firstTextInput: null,
-            favSport0: null,
-            favSport1: null,
-            lastTextInput: null,
-            favSport5: null,
-        };
 
         this.state = {
             ...initState
@@ -129,6 +122,21 @@ class TaskDetailsScreen extends Component {
         );
     }
 
+    renderDatePickers = () => {
+        return (
+            <>
+                <DateTimePicker currentDate={this.state.startDate} onDayPress={(date) => { this.setState({ startDate: date }) }}
+                    onTimeConfirm={(date) => { this.setState({ startDate: date }) }}
+                    label="Start Date and Time"
+                />
+                <DateTimePicker currentDate={this.state.endDate} onDayPress={(date) => { this.setState({ endDate: date }) }}
+                    onTimeConfirm={(date) => { this.setState({ endDate: date }) }}
+                    label="End Date and Time"
+                />
+            </>
+        );
+    }
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
@@ -149,7 +157,9 @@ class TaskDetailsScreen extends Component {
                             onChangeText={newInput => {
                                 this.setState({ title: newInput })
                             }}
+                            autoFocus
                         />
+                     
                         <Input
                             label='Location'
                             containerStyle={styles.formComponent}
@@ -157,17 +167,26 @@ class TaskDetailsScreen extends Component {
                                 this.setState({ location: newInput })
                             }}
                         />
+
                         {this.renderTaskListPickerAndDialog()}
-                        <DateTimePicker currentDate={this.state.startDate} onDayPress={(date)=>{this.setState({startDate: date})}}
-                        onTimeConfirm={(date)=>{this.setState({startDate: date})}}
-                        label = "Start Date and Time"
+
+                        <ProgressBar
+                            disabled={false}
+                            value={this.state.completionRate}
+                            onChangeFunc={(val) => { this.setState({ completionRate: val }) }}
                         />
-                        <DateTimePicker currentDate={this.state.endDate} onDayPress={(date)=>{this.setState({endDate: date})}}
-                        onTimeConfirm={(date)=>{this.setState({endDate: date})}}
-                        label = "End Date and Time"
+
+                        {this.renderDatePickers()}
+
+                        <Input
+                            label='Description'
+                            multiline
+                            onChangeText={text => { this.setState({ description: text }) }}
+                            value={this.state.description}
+                            containerStyle={styles.formComponent}
                         />
-                        <ProgressBar disabled={false} value={this.state.completionRate} onChangeFunc={(val) => { this.setState({ completionRate: val }) }} />
-                        <ProgressBar disabled value={this.state.completionRate} />
+
+
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
 
