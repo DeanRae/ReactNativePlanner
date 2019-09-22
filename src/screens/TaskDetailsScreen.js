@@ -12,6 +12,7 @@ import ProgressBar from '../components/ProgressBar';
 import Picker from '../components/Picker';
 import DateTimePicker from '../components/DateTimePicker/DateTimePicker';
 import getNZDateTime from '../components/utils/getNZDateTime';
+import SubtaskContainer from '../components/Subtasks/SubtaskContainer';
 
 const initState = {
     completionRate: 0,
@@ -22,7 +23,8 @@ const initState = {
     taskListDialog: false,
     startDate: getNZDateTime(new Date()),
     endDate: getNZDateTime(new Date()),
-    description: ''
+    description: '',
+    subtasks: []
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -112,12 +114,9 @@ class TaskDetailsScreen extends Component {
                     buttonName='Add New Task List'
                     buttonFunc={() => { this.toggleTaskListInputDialog() }}
                     options={[
-                        { label: 'Football', value: 'football' },
-                        { label: 'Baseball', value: 'baseball' },
-                        { label: 'Hockey', value: 'hockey' },
+
                     ]}
                 />
-
             </View>
         );
     }
@@ -159,7 +158,7 @@ class TaskDetailsScreen extends Component {
                             }}
                             autoFocus
                         />
-                     
+
                         <Input
                             label='Location'
                             containerStyle={styles.formComponent}
@@ -184,6 +183,24 @@ class TaskDetailsScreen extends Component {
                             onChangeText={text => { this.setState({ description: text }) }}
                             value={this.state.description}
                             containerStyle={styles.formComponent}
+                        />
+                        <SubtaskContainer
+                            subtasks={this.state.subtasks}
+                            onAdd={(subtask) => {
+                                this.setState({ subtasks: [...this.state.subtasks, subtask] })
+                            }}
+                            onEdit={(index, subtask) => {
+                                this.setState({
+                                    subtasks: this.state.subtasks.map((item, i) => {
+                                        return i == index ? subtask : item
+                                    })
+                                })
+                            }}
+                            onDelete={(index) => {
+                                this.setState({
+                                    subtasks: this.state.subtasks.filter((item, i) => i != index)
+                                })
+                            }}
                         />
 
 
