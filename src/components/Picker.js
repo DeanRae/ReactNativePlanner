@@ -54,7 +54,7 @@ export default class Picker extends Component {
     }
 
     render() {
-        const { label, options, value, onChangeFunc, placeholder, inputAccessoryLabel, buttonName, buttonFunc } = this.props;
+        const { label, options, value, onChangeFunc, placeholder, inputAccessoryLabel, buttonName, buttonFunc, disabled } = this.props;
         return (
             <View style={styles.pickerContainer}>
                 <Text style={styles.label}>{label}</Text>
@@ -70,6 +70,7 @@ export default class Picker extends Component {
                     value={value}
                     style={styles}
                     Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' size={24} /> }}
+                    disabled={disabled}
                 />
             </View>
         );
@@ -93,4 +94,5 @@ Picker.propTypes = {
         label: PropTypes.string.isRequired,
         value: PropTypes.any.isRequired
     }),
+    disabled: PropTypes.bool.isRequired
 }

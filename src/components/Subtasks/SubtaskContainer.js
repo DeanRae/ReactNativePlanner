@@ -68,10 +68,10 @@ export default class SubtaskContainer extends Component {
      * Renders the header of the subtasks container.
      * Contains the overall label and add new task button
      */
-    renderSubtaskHeader = () => {
+    renderSubtaskHeader = (disabled) => {
         return <View style={styles.subtaskHeader}>
             <Text style={styles.label}>Subtasks</Text>
-            <Button
+            {!disabled ? <Button
                 title='Add New Subtask'
                 type='clear'
                 icon={
@@ -83,7 +83,8 @@ export default class SubtaskContainer extends Component {
                 }
                 iconRight
                 onPress={() => { this.setState({ isAddTaskDialogVisible: true }) }}
-            />
+            /> : null}
+
         </View>
     }
 
@@ -120,10 +121,10 @@ export default class SubtaskContainer extends Component {
     }
 
     render() {
-        const { subtasks, onEdit } = this.props;
+        const { subtasks, onEdit, disabled } = this.props;
         return (
             <View>
-                {this.renderSubtaskHeader()}
+                {this.renderSubtaskHeader(disabled)}
                 <View style={styles.subtaskContainer}>
                     {
                         subtasks.length ? subtasks.map((subtask, index) => {
@@ -145,7 +146,7 @@ export default class SubtaskContainer extends Component {
                                         }}
                                     />
 
-                                    {this.renderSubtaskButtons(index, subtask)}
+                                    {!disabled ? this.renderSubtaskButtons(index, subtask) : null}
                                     {this.renderEditInputDialog(index, subtask)}
 
                                 </View>

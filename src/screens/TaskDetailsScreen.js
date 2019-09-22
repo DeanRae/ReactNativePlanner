@@ -97,11 +97,7 @@ class TaskDetailsScreen extends Component {
         );
     }
 
-    toggleTaskListInputDialog = () => {
-        this.setState({ taskListDialog: !this.state.taskListDialog });
-    }
-
-    renderTaskListPicker = () => {
+    renderTaskListPicker = (isDisabled) => {
         return (
             <View>
                 <Picker
@@ -115,30 +111,65 @@ class TaskDetailsScreen extends Component {
                     buttonName='Add New Task List'
                     buttonFunc={(list) => { this.props.addList(list) }}
                     options={this.props.lists}
+                    disabled={isDisabled}
                 />
             </View>
         );
     }
 
-    renderDatePickers = () => {
+    renderDatePickers = (isDisabled) => {
         return (
             <>
                 <DateTimePicker currentDate={this.state.startDate} onDayPress={(date) => { this.setState({ startDate: date }) }}
                     onTimeConfirm={(date) => { this.setState({ startDate: date }) }}
                     label="Start Date and Time"
+                    disabled = {isDisabled}
                 />
                 <DateTimePicker currentDate={this.state.endDate} onDayPress={(date) => { this.setState({ endDate: date }) }}
                     onTimeConfirm={(date) => { this.setState({ endDate: date }) }}
                     label="End Date and Time"
+                    disabled = {isDisabled}
                 />
             </>
         );
     }
 
+    extractTaskValues = () => {
+        return {
+            title: this.state.title,
+            description: this.state.description,
+            location: this.state.location,
+            listId: this.state.listId,
+            startDate: this.state.startDate,
+            endDate: this.state.endDate,
+            completionRate: this.state.completionRate,
+            isCompleted: this.state.isCompleted,
+            subtasks: this.state.subtasks
+        };
+    }
+
+    // renderTaskDetailButtons = () => {
+    //     const {isCompleted} = this.state;
+    //     <View>
+    //         <Button 
+    //             title={isCompleted? 'COMPLETE' : 'DELETE'}
+    //             color={isCompleted? '#4cd964':'#ff3b30'}
+    //             onPress={() => {
+    //                 this.props.editTask({...this.extractTaskValues(), isCompleted: true});
+    //                 this.navigation.goBack();
+    //         } : ()
+    //     }
+    //         />
+    //     </View>
+
+    // }
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
         const isEdit = navigation.getParam('isEdit', false);
+        const { routeName } = navigation.state;
+        console.log("ro", routeName);
         return (
             this.props.loading ? (
                 <LoadingIndicator />
@@ -155,7 +186,8 @@ class TaskDetailsScreen extends Component {
                             onChangeText={newInput => {
                                 this.setState({ title: newInput })
                             }}
-                            autoFocus
+                            autoFocus={routeName != 'TaskDetails'}
+                            editable={routeName != 'TaskDetails'}
                         />
 
                         <Input
@@ -164,17 +196,18 @@ class TaskDetailsScreen extends Component {
                             onChangeText={newInput => {
                                 this.setState({ location: newInput })
                             }}
+                            editable={routeName != 'TaskDetails'}
                         />
 
-                        {this.renderTaskListPicker()}
+                        {this.renderTaskListPicker(routeName == 'TaskDetails')}
 
                         <ProgressBar
-                            disabled={false}
+                            disabled={routeName == 'TaskDetails'}
                             value={this.state.completionRate}
                             onChangeFunc={(val) => { this.setState({ completionRate: val }) }}
                         />
 
-                        {this.renderDatePickers()}
+                        {this.renderDatePickers(routeName == 'TaskDetails')}
 
                         <Input
                             label='Description'
@@ -182,6 +215,7 @@ class TaskDetailsScreen extends Component {
                             onChangeText={text => { this.setState({ description: text }) }}
                             value={this.state.description}
                             containerStyle={styles.formComponent}
+                            editable={routeName != 'TaskDetails'}
                         />
                         <SubtaskContainer
                             subtasks={this.state.subtasks}
@@ -200,6 +234,8 @@ class TaskDetailsScreen extends Component {
                                     subtasks: this.state.subtasks.filter((item, i) => i != index)
                                 })
                             }}
+
+                            disabled={routeName == 'TaskDetails'}
                         />
 
                         <Button

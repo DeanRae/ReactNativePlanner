@@ -135,7 +135,7 @@ export default class DateTimePickerTester extends Component {
 
     renderDateTimePickerButton = (displayDate, time) => {
         if (!this.state.isDateTimePickerVisible) {
-            return (<TouchableOpacity style={styles.pickerButton} onPress={this.toggleDateTimePicker}>
+            return (<TouchableOpacity activeOpacity={this.props.disabled ? 1 : 0.7} style={styles.pickerButton} onPress={this.props.disabled ? null: this.toggleDateTimePicker}>
                 <Text style={styles.pickerLabel}>{this.props.label}</Text>
                 <Text style={styles.pickerButtonText}>{displayDate} {time}</Text>
             </TouchableOpacity>);
