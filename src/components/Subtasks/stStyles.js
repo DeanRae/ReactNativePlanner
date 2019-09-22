@@ -14,5 +14,13 @@ export default styles = StyleSheet.create({
         fontSize: 20,
         color: '#86939e',
         fontWeight: 'bold',
+    },
+    subtaskContainer: {
+        margin: 20,
+    },
+    noSubtasksText: {
+        color: '#9EA0A4',
+        fontSize: 16,
+        textAlign: 'center'
     }
 });
