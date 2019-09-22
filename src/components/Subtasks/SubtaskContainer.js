@@ -5,9 +5,7 @@ export default class SubtaskContainer {
 
     render() {
         return (
-            <View>
-                <View 
-            </View>
+            
         );
     }
 
@@ -20,12 +18,5 @@ Picker.propTypes = {
             value: PropTypes.string.isRequired,
         }).isRequired
     ).isRequired,
-    onChangeFunc: PropTypes.func.isRequired,
-    inputAccessoryLabel: PropTypes.string.isRequired,
-    buttonName: PropTypes.string,
-    buttonFunc: PropTypes.func,
-    placeholder: PropTypes.exact({
-        label: PropTypes.string.isRequired,
-        value: PropTypes.any.isRequired
-    }),
+
 }
