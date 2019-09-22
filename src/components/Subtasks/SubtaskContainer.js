@@ -8,6 +8,7 @@ import styles from './stStyles';
 export default class SubtaskContainer extends Component {
 
     render() {
+        const { subtasks } = this.props;
         return (
             <View>
                 <View style={styles.subtaskHeader}>
@@ -15,15 +16,27 @@ export default class SubtaskContainer extends Component {
                     <Button
                         title='Add New Subtask'
                         type='clear'
-                        // icon={
-                        //     <Icon
-                        //         name="ios-add"
-                        //         size={20}
-                        //         color='#007aff'
-                        //     />
-                        // }
-                        // iconRight
+                    icon={
+                        <Icon
+                            name="ios-add"
+                            size={20}
+                            color='#007aff'
+                        />
+                    }
+                    iconRight
                     />
+                </View>
+                <View style={styles.subtaskContainer}>
+                    {
+                        subtasks.length ? subtasks.map((field, key) => {
+
+                        }) :
+
+                        <Text style={styles.noSubtasksText}>
+                            This task currently has no subtasks
+                        </Text>
+                    }
+
                 </View>
             </View>
         );
