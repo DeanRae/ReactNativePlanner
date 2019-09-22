@@ -21,9 +21,10 @@ export default class Picker extends Component {
         };
 
         this.state = {
-            text: ''
+            newListTitle: ''
         }
     }
+
     /**
      * Renders a label on the right side and a text button on the left side
      * of the bar above the picker.
@@ -33,16 +34,15 @@ export default class Picker extends Component {
         const { inputAccessoryLabel, buttonName, buttonFunc } = this.props;
 
         return (
-
             <View style={defaultStyles.modalViewMiddle}>
                 <View style={styles.pickerInputAccessory} >
                     <TextInput style={{
                         paddingLeft: 10,
-                    }} placeholder="Add new task list..." onChangeText={(newInput) => { this.setState({ text: newInput }) }} autoCorrect={false} />
+                    }} placeholder="Add new task list..." onChangeText={(newInput) => { this.setState({ newListTitle: newInput }) }} autoCorrect={false} />
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                        buttonFunc();
+                        buttonFunc({title: this.state.newListTitle});
                     }}
                     hitSlop={{ top: 4, right: 4, bottom: 4, left: 4 }}>
                     <View>
@@ -50,12 +50,6 @@ export default class Picker extends Component {
                     </View>
                 </TouchableOpacity>
             </View>
-
-
-
-
-
-
         );
     }
 

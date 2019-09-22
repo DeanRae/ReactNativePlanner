@@ -18,13 +18,14 @@ const initState = {
     completionRate: 0,
     title: '',
     location: '',
-    taskList: '',
+    listId: '',
     newTaskList: '',
     taskListDialog: false,
     startDate: getNZDateTime(new Date()),
     endDate: getNZDateTime(new Date()),
     description: '',
-    subtasks: []
+    subtasks: [],
+    isCompleted: false
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -48,10 +49,10 @@ class TaskDetailsScreen extends Component {
 
     componentDidUpdate = (prevProps) => {
         console.log("state", this.state);
-        if (this.props.error) {
+        if (this.props.taskError || this.props.listError) {
             Alert.alert(
                 'Error',
-                this.props.error,
+                this.props.taskError ? this.props.taskError : this.prevProps.listError,
             );
 
             this.props.errorDisplayed();
@@ -100,22 +101,20 @@ class TaskDetailsScreen extends Component {
         this.setState({ taskListDialog: !this.state.taskListDialog });
     }
 
-    renderTaskListPickerAndDialog = () => {
+    renderTaskListPicker = () => {
         return (
             <View>
                 <Picker
                     placeholder={{ label: 'Select a task list...', value: '' }}
                     label='List'
-                    value={this.state.taskList}
+                    value={this.state.listId}
                     onChangeFunc={(value) => {
-                        this.setState({ ["taskList"]: value });
+                        this.setState({ ["listId"]: value });
                     }}
                     inputAccessoryLabel='Select A Task List'
                     buttonName='Add New Task List'
-                    buttonFunc={() => { this.toggleTaskListInputDialog() }}
-                    options={[
-
-                    ]}
+                    buttonFunc={(list) => { this.props.addList(list) }}
+                    options={this.props.lists}
                 />
             </View>
         );
@@ -167,7 +166,7 @@ class TaskDetailsScreen extends Component {
                             }}
                         />
 
-                        {this.renderTaskListPickerAndDialog()}
+                        {this.renderTaskListPicker()}
 
                         <ProgressBar
                             disabled={false}
@@ -203,7 +202,22 @@ class TaskDetailsScreen extends Component {
                             }}
                         />
 
-
+                        <Button
+                            title="Save"
+                            onPress={() => {
+                                this.props.addTask({
+                                    title: this.state.title,
+                                    description: this.state.description,
+                                    location: this.state.location,
+                                    listId: this.state.listId,
+                                    startDate: this.state.startDate,
+                                    endDate: this.state.endDate,
+                                    completionRate: this.state.completionRate,
+                                    isCompleted: this.state.isCompleted,
+                                    subtasks: this.state.subtasks
+                                })
+                            }}
+                        />
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
 
@@ -219,11 +233,14 @@ class TaskDetailsScreen extends Component {
                     });
                 }} /> */}
 
-const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, tasks } }) => ({
+const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, tasks }, taskLists: { listOperationError, taskLists } }) => ({
     loading: taskOperationLoading,
-    error: taskOperationError,
+    taskError: taskOperationError,
     tasks: tasks.byId,
-    taskIds: tasks.allIds
+    taskIds: tasks.allIds,
+    lists: Object.values(taskLists.byId).map((value) => ({ label: value.title, value: value.id })),
+    listIds: taskLists.allIds,
+    listError: listOperationError
 });
 
 const mapDispatchToProps = {
