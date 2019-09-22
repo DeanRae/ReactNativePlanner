@@ -22,5 +22,16 @@ export default styles = StyleSheet.create({
         color: '#9EA0A4',
         fontSize: 16,
         textAlign: 'center'
+    },
+    subtask: {
+        flexDirection: 'row',  
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    buttonContainer: {
+        flexDirection: 'row',  
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        width: 100
     }
 });
