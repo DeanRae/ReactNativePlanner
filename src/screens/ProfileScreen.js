@@ -116,7 +116,6 @@ class ProfileScreen extends Component {
 
               {Object.keys(fields).map((field, key) => {
                 if (field == "newPassword") return;
-                console.log("renderin");
                 return <TouchableOpacity
                   onPress={() => { this.toggleVisibility(field) }}
                   style={{ zIndex: 5 }}

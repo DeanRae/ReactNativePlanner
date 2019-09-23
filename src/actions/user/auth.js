@@ -32,7 +32,6 @@ export const signupUser = (data) => dispatch => {
             dispatch(signupSuccess(newUserCredential.user));
         })
         .catch(error => {
-            console.log(error.message);
             dispatch(sessionError(error.message));
         });
 
