@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SafeAreaView, Text, View, TouchableOpacity , ActionSheetIOS} from 'react-native';
+import { SafeAreaView, Text, View, TouchableOpacity, ActionSheetIOS } from 'react-native';
 import { connect } from 'react-redux';
 import { Button, Input, Header } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -41,8 +41,6 @@ class TaskDetailsScreen extends Component {
         this.state = {
             ...initState
         }
-
-        console.log("the state", this.state);
     }
 
     componentDidMount = () => {
@@ -54,21 +52,26 @@ class TaskDetailsScreen extends Component {
         if (routeName != 'CreateTask') {
             this.setState({
                 ...this.state,
-                completionRate: task.completionRate,
-                title: task.title,
-                location: task.location,
-                listId: task.listId,
-                startDate: task.startDate,
-                endDate: task.endDate,
-                description: task.description,
-                subtasks: task.subtasks,
-                isCompleted: task.isCompleted
+                ...this.getTaskValues(task)
             })
         }
     }
 
+    getTaskValues = (task) => {
+        return {
+            completionRate: task.completionRate,
+            title: task.title,
+            location: task.location,
+            listId: task.listId,
+            startDate: task.startDate,
+            endDate: task.endDate,
+            description: task.description,
+            subtasks: task.subtasks,
+            isCompleted: task.isCompleted
+        };
+    }
+
     componentDidUpdate = (prevProps) => {
-        console.log("state", this.state);
         if (this.props.taskError || this.props.listError) {
             Alert.alert(
                 'Error',
@@ -78,8 +81,8 @@ class TaskDetailsScreen extends Component {
             this.props.errorDisplayed();
         }
 
-        if (!this.props.loading && this.state.finished) {
-            this.props.navigation.goBack();
+        if (!(this.props.taskError || this.props.listError) && !this.props.loading && this.state.finished) {
+            this.props.navigation.popToTop();
         }
     }
 
@@ -165,12 +168,12 @@ class TaskDetailsScreen extends Component {
         switch (routeName) {
             case 'CreateTask':
                 return <Button title="Save" type="clear" onPress={() => {
-                    this.setState({finished: true});
+                    this.setState({ finished: true });
                     this.props.addTask(this.extractTaskValues());
                 }} />
             case 'EditTask':
                 return <Button title="Save" type="clear" onPress={() => {
-                    this.setState({finished: true});
+                    this.setState({ finished: true });
                     this.props.editTask(taskId, this.extractTaskValues());
                 }} />
             case 'TaskDetails':
@@ -200,12 +203,12 @@ class TaskDetailsScreen extends Component {
             },
             (buttonIndex) => {
                 if (buttonIndex === 0) {
-                    navigation.navigate("EditTask", {id: taskId});
+                    navigation.navigate("EditTask", { id: taskId });
                 } else if (buttonIndex === 1) {
-                    this.setState({finished: true});
-                    this.props.editTask(taskId, {isCompleted: isCompleted? false:true});
+                    this.setState({ finished: true });
+                    this.props.editTask(taskId, { isCompleted: isCompleted ? false : true });
                 } else if (buttonIndex === 2) {
-                    this.setState({finished: true});
+                    this.setState({ finished: true });
                     this.props.deleteTask(taskId);
                 }
             }
@@ -315,7 +318,7 @@ class TaskDetailsScreen extends Component {
                         <Button
                             title="Save"
                             onPress={() => {
-                                this.setState({finished: true});
+                                this.setState({ finished: true });
                                 this.props.addTask(this.extractTaskValues());
                             }}
                         />

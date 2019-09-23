@@ -12,10 +12,7 @@ class TaskListsScreen extends Component {
     static navigationOptions = () => ({
         title: 'Task Lists'
     });
-
-    componentDidMount = () => {
-        console.log("pros", this.props)
-    }
+    
     componentDidUpdate = (prevProps) => {
 
         if (this.props.taskError || this.props.listError) {

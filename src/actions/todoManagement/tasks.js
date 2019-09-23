@@ -7,7 +7,6 @@ export const getAllTasks = () => (dispatch, getState) => {
     const {auth} = getState();
     const user = {...auth.user};
     
-    console.log("in get all tasks ", user);
     let newTasks = {
         byId: {},
         allIds: []
