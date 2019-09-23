@@ -30,6 +30,7 @@ class TaskListsScreen extends Component {
     }
 
     render() {
+        const { listItems, listDetails, listIds, editList, deleteList } = this.props
         return (
             this.props.loading ? (
                 <LoadingIndicator />
@@ -49,12 +50,28 @@ class TaskListsScreen extends Component {
                         <Accordion
                             title="All Tasks"
                             items={Object.values(this.props.tasks)}
-                            hasOptions={true}
+                            options='deleteItemsOnly'
                             onTitleEdit={() => { console.log("title edited") }}
                             onListDelete={() => { console.log("list deleted") }}
                             onListItemsDelete={() => { console.log("title edited") }}
                             navigation={this.props.navigation}
                         />
+                        {!listIds.length ? null :
+                            listIds.map((id, key) => {
+                                console.log("mapped", id);
+                                console.log("mk", key);
+                                return <Accordion
+                                    title={listDetails[id].title}
+                                    items={listItems[id]}
+                                    options='all'
+                                    onTitleEdit={(listId, list) => { editList(listId, list) }}
+                                    onListDelete={() => { deleteList(listId) }}
+                                    onListItemsDelete={() => { console.log("title edited") }}
+                                    navigation={this.props.navigation}
+                                    key={key}
+                                />
+                            })
+                        }
                     </SafeAreaView>
                 </KeyboardAwareScrollView>
         );
@@ -66,7 +83,7 @@ const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, ta
     taskError: taskOperationError,
     tasks: tasks.byId,
     taskIds: tasks.allIds,
-    lists: Object.values(taskLists.byId).reduce((object, list) => {
+    listItems: Object.values(taskLists.byId).reduce((object, list) => {
         object[list.id] = Object.values(tasks.byId).filter(task => task.listId == list.id);
         return object;
     }, {}),
