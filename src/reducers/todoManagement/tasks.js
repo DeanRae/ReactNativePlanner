@@ -22,7 +22,7 @@ const tasks = (state = initialState, action) => {
                 return object
             }, {});
 
-            return { ...state, tasks: { byId: newById, allIds: initialState.tasks.allIds.filter(task => task !== action.taskId) }, taskOperationLoading: false };
+            return { ...state, tasks: { byId: newById, allIds: state.tasks.allIds.filter(task => task != action.taskId) }, taskOperationLoading: false };
         case types.TASK_OPERATION_ERROR:
             return { ...state, taskOperationError: action.error, taskOperationLoading: false };
         case types.TASK_MODIFIED:
