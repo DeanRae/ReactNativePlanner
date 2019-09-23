@@ -4,7 +4,9 @@ const styles = StyleSheet.create({
     parentView: {
         flexGrow: 1,
         justifyContent: 'center',
-
+    },
+    parentViewFlex: {
+        flex: 1,
     },
     centered: {
         flex: 1,
@@ -12,7 +14,8 @@ const styles = StyleSheet.create({
         margin: 10
     },
     formComponent: {
-        marginBottom: 30,
+        marginBottom: 15,
+        marginTop: 15
     },
     buttonStyle: {
         marginBottom: 10,
@@ -36,6 +39,10 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
     },
+    barContainer: {
+        marginTop: 10,
+        marginBottom: 10
+    },
     progressBarHeight: {
         transform: [{ scaleY: 2.0 }],
         flex: 1,
@@ -57,7 +64,6 @@ const styles = StyleSheet.create({
 
     },
     barLabel: {
-        fontWeight: 'bold',
         margin: 10,
         marginBottom: 20,
         marginTop: 20
@@ -73,7 +79,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-
         elevation: 5,
         backgroundColor: '#fff'
     },
@@ -85,7 +90,6 @@ const styles = StyleSheet.create({
     // Picker Styles
     pickerContainer: {
         margin: 10,
-        marginBottom: 30
     },
     inputIOS: {
         fontSize: 16,
@@ -100,6 +104,22 @@ const styles = StyleSheet.create({
         top: 10,
         right: 12,
     },
+    pickerInputAccessory: {
+        justifyContent: "center", 
+        height: 30, 
+        width: 200, 
+        borderColor: '#bdc6cf',
+        borderWidth: 1,
+        borderRadius: 4,
+        backgroundColor: 'white',
+        paddingLeft: 10
+    },
+    bottomBorder: {
+        borderBottomColor: '#86939e',
+        borderBottomWidth: 1,
+        marginBottom: 15,
+        paddingBottom: 20
+    }
 });
 
 export default styles;
