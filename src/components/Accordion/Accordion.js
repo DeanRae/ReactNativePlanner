@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, ActionSheetIOS } from 'react-native';
+import { View, Text, TouchableOpacity, ActionSheetIOS, FlatList } from 'react-native';
 import { Button, CheckBox } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import InputDialog from '../InputDialog';
 import styles from './accStyles'
+import TaskItem from '../TaskItem/TaskItem';
 
 const initState = {
     isExpanded: false,
@@ -80,11 +81,18 @@ export default class Accordion extends Component {
                     }}
                 />
                 : null}
-
-            {this.renderEditTitleDialog()}
         </View>
     }
 
+    renderListItems = () => {
+        const { items, navigation } = this.props;
+        return (
+            !items.length ? <Text style={styles.noItemsText}>No Tasks</Text> :
+                items.map((item, key) => {
+                   return <TaskItem task={item} key={key} navigation={navigation}/>
+                })
+        );
+    }
 
     render() {
         const { title, hasOptions, listId, onListDelete, onListItemsDelete, onTitleEdit } = this.props;
@@ -92,12 +100,13 @@ export default class Accordion extends Component {
         return (
             <>
                 <TouchableOpacity
-                    style={styles.accordionContainer}
+                    style={!isExpanded ? styles.accordionContainer : [styles.accordionContainer, styles.expandedColor]}
                     onPress={() => { this.setState({ isExpanded: !isExpanded }) }}
                 >
                     <Text style={styles.label}>{title}</Text>
                     {this.renderIconButtons()}
                 </TouchableOpacity>
+                {isExpanded ? this.renderListItems() : null}
                 <>
                     {this.renderEditTitleDialog()}
                 </>
@@ -115,5 +124,6 @@ Accordion.propTypes = {
     onTitleEdit: PropTypes.func.isRequired,
     onListDelete: PropTypes.func.isRequired,
     onListItemsDelete: PropTypes.func.isRequired,
-    listId: PropTypes.string
+    listId: PropTypes.string,
+    navigation: PropTypes.any.isRequired
 }
