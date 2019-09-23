@@ -26,11 +26,11 @@ export const getAllTasks = () => (dispatch, getState) => {
                         description: taskData.description,
                         location: taskData.location,
                         listId: taskData.listId,
-                        startTime: taskData.startTime,
-                        endTime: taskData.endTime,
-                        allDay: taskData.allDay,
+                        startDate: taskData.startDate,
+                        endDate: taskData.endDate,
                         completionRate: taskData.completionRate,
                         isCompleted: taskData.isCompleted,
+                        subtasks: taskData.subtasks,
                         createdTimestamp: taskData.createdTimestamp,
                         updatedTimestamp: taskData.updatedTimestamp
                     };
@@ -56,11 +56,13 @@ export const addTask = (task) => (dispatch, getState) => {
 
     let newTask = {};
 
-    firestore()
-        .collection(`/userProfile/${user.uid}/tasks`)
-        .add({...task, createdTimestamp: timestamp})
-        .then(docRef => {
-            newTask = {...task, id: docRef.id, createdTimestamp: timestamp};
+    const newTaskRef = firestore()
+        .collection(`/userProfile/${user.uid}/tasks`).doc();
+
+        newTaskRef
+        .set({...task, createdTimestamp: timestamp, id: newTaskRef.id})
+        .then(() => {
+            newTask = {...task, id: newTaskRef.id, createdTimestamp: timestamp};
             dispatch(taskAdded(newTask));
         })
         .catch( error => {            
@@ -83,7 +85,7 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
             updatedTimestamp: timestamp
         })
         .then(() => {
-            dispatch(taskModified({...editedContents, updatedTimestamp: timestamp}));
+            dispatch(taskModified({...editedContents, updatedTimestamp: timestamp, id: taskId}));
         })
         .catch( error => {          
             dispatch(taskOperationError(error.message));
