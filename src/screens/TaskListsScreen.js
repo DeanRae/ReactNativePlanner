@@ -50,23 +50,25 @@ class TaskListsScreen extends Component {
                         <Accordion
                             title="All Tasks"
                             items={Object.values(this.props.tasks)}
+                            expanded={false}
                             options='deleteItemsOnly'
                             onTitleEdit={() => { console.log("title edited") }}
                             onListDelete={() => { console.log("list deleted") }}
                             onListItemsDelete={() => { console.log("title edited") }}
+                            noItemsText='No Tasks'
                             navigation={this.props.navigation}
                         />
                         {!listIds.length ? null :
                             listIds.map((id, key) => {
-                                console.log("mapped", id);
-                                console.log("mk", key);
                                 return <Accordion
                                     title={listDetails[id].title}
                                     items={listItems[id]}
+                                    expanded={false}
                                     options='all'
                                     onTitleEdit={(listId, list) => { editList(listId, list) }}
                                     onListDelete={() => { deleteList(listId) }}
                                     onListItemsDelete={() => { console.log("title edited") }}
+                                    noItemsText='No Tasks'
                                     navigation={this.props.navigation}
                                     key={key}
                                 />
