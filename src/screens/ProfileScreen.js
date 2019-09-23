@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { updatePassword, updateUserEmail, updateUserName, errorDisplayed, logoutUser } from '../actions/user/auth';
 import { Input, Button, Header } from 'react-native-elements';
-import { Snackbar } from 'react-native-paper';
 import styles from '../components/utils/globalStyles';
 import InputDialog from '../components/InputDialog';
 import { createTitleFromFieldName } from '../components/utils/textTransformations';
@@ -17,7 +16,6 @@ const fields = {
 }
 
 const visibleState = {
-  snackbar: false,
   name: false,
   email: false,
   password: false,
@@ -63,19 +61,13 @@ class ProfileScreen extends Component {
   }
 
   /**
-   * Toggles the visibility of the dialogs and snackbar. 
-   * Snackbar's visibility is toggled if any of the dialogs were
-   * previously true.
+   * Toggles the visibility of the dialogs. 
    */
   toggleVisibility = (fieldName) => {
-    prevVisib = fieldName != 'snackbar' ? this.state.visibleState[fieldName] : false;
     const visibleState = {
       ...this.state.visibleState,
-      [fieldName]: !prevVisib,
-      ['snackbar']: prevVisib ? true : false
+      [fieldName]: !this.state.visibleState[fieldName],
     }
-    console.log("toggling state", visibleState);
-
     this.setState({ visibleState });
   }
 
@@ -178,14 +170,6 @@ class ProfileScreen extends Component {
                 onPress={() => { this.props.logout() }}
                 buttonStyle={styles.logoutButtonStyle}
               />
-              <Snackbar
-                visible={this.state.visibleState['snackbar']}
-                onDismiss={() => this.toggleVisibility("snackbar")}
-                duration={Snackbar.DURATION_SHORT}
-              >
-                Profile Updated 
-        </Snackbar>
-
             </SafeAreaView>
           )}
       </View>
