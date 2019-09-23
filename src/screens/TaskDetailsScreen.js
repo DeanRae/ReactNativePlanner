@@ -47,6 +47,28 @@ class TaskDetailsScreen extends Component {
         console.log("the state", this.state);
     }
 
+    componentDidMount = () => {
+        const { navigation, tasks } = this.props;
+        const taskId = navigation.getParam('id', '');
+        const task = tasks[taskId];
+        const { routeName } = navigation.state;
+
+        if (routeName != 'CreateTask') {
+            this.setState({
+                ...this.state,
+                completionRate: task.completionRate ,
+                title: task.title,
+                location: task.location,
+                listId: task.listId,
+                startDate: task.startDate,
+                endDate: task.endDate,
+                description: task.description,
+                subtasks: task.subtasks,
+                isCompleted: task.isCompleted
+            })
+        }
+    }
+
     componentDidUpdate = (prevProps) => {
         console.log("state", this.state);
         if (this.props.taskError || this.props.listError) {
@@ -123,12 +145,12 @@ class TaskDetailsScreen extends Component {
                 <DateTimePicker currentDate={this.state.startDate} onDayPress={(date) => { this.setState({ startDate: date }) }}
                     onTimeConfirm={(date) => { this.setState({ startDate: date }) }}
                     label="Start Date and Time"
-                    disabled = {isDisabled}
+                    disabled={isDisabled}
                 />
                 <DateTimePicker currentDate={this.state.endDate} onDayPress={(date) => { this.setState({ endDate: date }) }}
                     onTimeConfirm={(date) => { this.setState({ endDate: date }) }}
                     label="End Date and Time"
-                    disabled = {isDisabled}
+                    disabled={isDisabled}
                 />
             </>
         );
@@ -169,7 +191,7 @@ class TaskDetailsScreen extends Component {
         const taskId = navigation.getParam('id', '');
         const isEdit = navigation.getParam('isEdit', false);
         const { routeName } = navigation.state;
-        console.log("ro", routeName);
+
         return (
             this.props.loading ? (
                 <LoadingIndicator />
@@ -182,6 +204,7 @@ class TaskDetailsScreen extends Component {
                     <SafeAreaView style={styles.centered}>
                         <Input
                             label='Title *'
+                            value={this.state.title}
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
                                 this.setState({ title: newInput })
@@ -192,6 +215,7 @@ class TaskDetailsScreen extends Component {
 
                         <Input
                             label='Location'
+                            value={this.state.location}
                             containerStyle={styles.formComponent}
                             onChangeText={newInput => {
                                 this.setState({ location: newInput })
