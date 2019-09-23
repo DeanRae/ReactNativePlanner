@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { Header } from 'react-native-elements';
 import LoadingIndicator from '../components/LoadingIndicator';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import { addList, deleteList, editList } from '../actions/todoManagement/taskLists';
 import styles from '../components/utils/globalStyles';
@@ -35,9 +34,8 @@ class TaskListsScreen extends Component {
             this.props.loading ? (
                 <LoadingIndicator />
             ) :
-                <KeyboardAwareScrollView
+                <ScrollView
                     contentContainerStyle={styles.parentView}
-                    resetScrollToCoords={{ x: 0, y: 0 }}
                 >
                     <Header
                         centerComponent={{ text: 'Task Lists', style: styles.header }}
@@ -75,7 +73,7 @@ class TaskListsScreen extends Component {
                             })
                         }
                     </SafeAreaView>
-                </KeyboardAwareScrollView>
+                </ScrollView>
         );
     }
 }
