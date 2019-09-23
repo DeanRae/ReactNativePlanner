@@ -16,7 +16,6 @@ import TaskDetailsScreen from '../screens/TaskDetailsScreen';
 
 const AppTabs = createBottomTabNavigator(
   {
-    TaskDetails: TaskDetailsScreen,
     Home: HomeScreen,
     TaskLists: TaskListsScreen,
     Calendar: CalendarScreen,
@@ -38,7 +37,9 @@ AppTabs.navigationOptions = {
  */
 const AppNav = createStackNavigator({
   Tabs: AppTabs,
-  TaskDetails: TaskDetailsScreen
+  TaskDetails: TaskDetailsScreen,
+  EditTask: TaskDetailsScreen,
+  CreateTask: TaskDetailsScreen
 });
 
 /**
