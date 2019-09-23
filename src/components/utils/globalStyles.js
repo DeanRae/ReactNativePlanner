@@ -13,6 +13,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         margin: 10
     },
+    welcomeText: {
+        fontSize: 40,
+        margin: 20,
+    },
+    accordionListContainer: {
+        flex: 2
+    },
     formComponent: {
         marginBottom: 15,
         marginTop: 15
@@ -28,7 +35,8 @@ const styles = StyleSheet.create({
     },
     header: {
         color: '#000',
-        fontSize: 20
+        fontSize: 17,
+        fontWeight: 'bold'
     },
     headerContainer: {
         borderBottomColor: '#bbb'

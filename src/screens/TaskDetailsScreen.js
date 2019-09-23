@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { SafeAreaView, Text, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Text, View, TouchableOpacity , ActionSheetIOS} from 'react-native';
 import { connect } from 'react-redux';
-import { Button, Input } from 'react-native-elements';
+import { Button, Input, Header } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import { addList } from '../actions/todoManagement/taskLists';
 import styles from '../components/utils/globalStyles';
-import { createTitleFromFieldName } from '../components/utils/textTransformations';
+import Icon from 'react-native-vector-icons/Ionicons';
 import ProgressBar from '../components/ProgressBar';
 import Picker from '../components/Picker';
 import DateTimePicker from '../components/DateTimePicker/DateTimePicker';
@@ -25,20 +25,18 @@ const initState = {
     endDate: getNZDateTime(new Date()),
     description: '',
     subtasks: [],
-    isCompleted: false
+    isCompleted: false,
+    finished: false
 }
 class TaskDetailsScreen extends Component {
     static navigationOptions = ({ navigation }) => {
-        const routeName = navigation.state.routeName;
         return {
-            title: createTitleFromFieldName(routeName),
+            header: null
         }
     };
 
     constructor(props) {
         super(props);
-
-        const params = this.getNavParams(props.navigation);
 
         this.state = {
             ...initState
@@ -56,7 +54,7 @@ class TaskDetailsScreen extends Component {
         if (routeName != 'CreateTask') {
             this.setState({
                 ...this.state,
-                completionRate: task.completionRate ,
+                completionRate: task.completionRate,
                 title: task.title,
                 location: task.location,
                 listId: task.listId,
@@ -79,44 +77,21 @@ class TaskDetailsScreen extends Component {
 
             this.props.errorDisplayed();
         }
-    }
 
-    getNavParams = (navigation) => {
-        return {
-            taskId: navigation.getParam('id', ''),
-            isEdit: navigation.getParam('isEdit', false)
-        };
-    }
-
-    getHeaderTitle = () => {
-        const { navigation } = this.props;
-        const params = this.getNavParams(navigation);
-
-        if (params.taskId && params.isEdit) {
-            return 'Edit Task';
-        } else if (params.taskId && !params.isEdit) {
-            return 'Task Details';
-        } else {
-            return 'Create Task';
+        if (!this.props.loading && this.state.finished) {
+            this.props.navigation.goBack();
         }
-
     }
 
-    inputAccessoryView = () => {
-        return (
-            <View style={defaultStyles.modalViewMiddle}>
-                <Text>Select A Task List</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        console.log("add new list pressed");
-                    }}
-                    hitSlop={{ top: 4, right: 4, bottom: 4, left: 4 }}>
-                    <View>
-                        <Text style={defaultStyles.done}>Add New List</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        );
+    getHeaderTitle = (routeName) => {
+        switch (routeName) {
+            case 'EditTask':
+                return 'Edit Task';
+            case 'TaskDetails':
+                return 'Task Details';
+            case 'CreateTask':
+                return 'Create Task';
+        }
     }
 
     renderTaskListPicker = (isDisabled) => {
@@ -186,10 +161,62 @@ class TaskDetailsScreen extends Component {
 
     // }
 
+    getRightHeaderButton = (routeName, taskId) => {
+        switch (routeName) {
+            case 'CreateTask':
+                return <Button title="Save" type="clear" onPress={() => {
+                    this.setState({finished: true});
+                    this.props.addTask(this.extractTaskValues());
+                }} />
+            case 'EditTask':
+                return <Button title="Save" type="clear" onPress={() => {
+                    this.setState({finished: true});
+                    this.props.editTask(taskId, this.extractTaskValues());
+                }} />
+            case 'TaskDetails':
+                return <Button
+                    type="clear"
+                    containerStyle={{ alignItems: 'flex-start', marginRight: 15 }}
+                    icon={
+                        <Icon
+                            name="ios-more"
+                            size={30}
+                            color="#007aff"
+                        />
+                    }
+                    onPress={() => { this.showActionSheet() }} />
+        }
+    }
+
+    showActionSheet = () => {
+        const { isCompleted } = this.state;
+        const { navigation } = this.props;
+        const taskId = navigation.getParam('id', '');
+        ActionSheetIOS.showActionSheetWithOptions(
+            {
+                options: ['Edit', isCompleted ? 'Reactivate Task' : 'Complete Task', 'Delete', 'Cancel'],
+                destructiveButtonIndex: 2,
+                cancelButtonIndex: 3,
+            },
+            (buttonIndex) => {
+                if (buttonIndex === 0) {
+                    navigation.navigate("EditTask", {id: taskId});
+                } else if (buttonIndex === 1) {
+                    this.setState({finished: true});
+                    this.props.editTask(taskId, {isCompleted: isCompleted? false:true});
+                } else if (buttonIndex === 2) {
+                    this.setState({finished: true});
+                    this.props.deleteTask(taskId);
+                }
+            }
+        );
+    }
+
+
+
     render() {
         const { navigation } = this.props;
         const taskId = navigation.getParam('id', '');
-        const isEdit = navigation.getParam('isEdit', false);
         const { routeName } = navigation.state;
 
         return (
@@ -201,6 +228,29 @@ class TaskDetailsScreen extends Component {
                     contentContainerStyle={styles.parentView}
                     resetScrollToCoords={{ x: 0, y: 0 }}
                 >
+                    <Header
+                        centerComponent={{ text: this.getHeaderTitle(routeName), style: styles.header }}
+                        leftComponent={
+                            <Button
+                                type="clear"
+                                title="Back"
+                                titleStyle={{ marginLeft: 5, fontSize: 20, fontWeight: 'bold' }}
+                                containerStyle={{ alignItems: 'center' }}
+                                icon={
+                                    <Icon
+                                        name="ios-arrow-back"
+                                        size={30}
+                                        color="#007aff"
+                                    />
+                                }
+                                onPress={() => { navigation.goBack() }}
+                            />
+                        }
+                        rightComponent={this.getRightHeaderButton(routeName, taskId)}
+                        backgroundColor="white"
+                        containerStyle={styles.headerContainer}
+                        statusBarProps={{ barStyle: 'dark-content' }}
+                    />
                     <SafeAreaView style={styles.centered}>
                         <Input
                             label='Title *'
@@ -265,17 +315,8 @@ class TaskDetailsScreen extends Component {
                         <Button
                             title="Save"
                             onPress={() => {
-                                this.props.addTask({
-                                    title: this.state.title,
-                                    description: this.state.description,
-                                    location: this.state.location,
-                                    listId: this.state.listId,
-                                    startDate: this.state.startDate,
-                                    endDate: this.state.endDate,
-                                    completionRate: this.state.completionRate,
-                                    isCompleted: this.state.isCompleted,
-                                    subtasks: this.state.subtasks
-                                })
+                                this.setState({finished: true});
+                                this.props.addTask(this.extractTaskValues());
                             }}
                         />
                     </SafeAreaView>
