@@ -19,19 +19,19 @@ export default class TaskItem extends Component {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate("TaskDetails", {id: task.id})}
+                onPress={() => navigation.navigate("TaskDetails", { id: task.id })}
                 style={styles.itemContainer}
             >
-                <View style={styles.itemHeaderContainer}>
-                    <Text style={styles.itemDateText}>Start Date: {startDate} {startTime}</Text>
-                    <Text style={styles.itemInfoText}>Info</Text>
-                    {/* <Text style={calStyles.itemDurationText}>{item.duration}</Text> */}
-                </View>
+                <Text style={styles.itemDateText}>Start Date: {startDate} {startTime}</Text>
+
                 <Text style={styles.itemTitleText}>{task.title}</Text>
-
-
-
                 <ProgressBar disabled value={task.completionRate} />
+                <Icon
+                    name="ios-more"
+                    size={25}
+                    color='#007aff'
+                    style={{ alignSelf: 'flex-end' }}
+                />
             </TouchableOpacity>
         );
     }
