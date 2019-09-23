@@ -16,8 +16,8 @@ export default class ProgressBar extends Component {
      */
     renderProgressBar = (value) => {
         return (
-            <View>
-                <Text style={styles.barLabel}>
+            <View style={styles.barContainer}>
+                <Text style={[styles.barLabel, styles.label]}>
                     Completion Rate: {(value*100).toFixed(0)}%
                 </Text>
                 <View style={styles.progressBar}>
@@ -33,8 +33,8 @@ export default class ProgressBar extends Component {
      */
     renderSliderBar = (value, onChangeFunc) => {
         return (
-            <View>
-                <Text style={styles.barLabel}>Completion Rate</Text>
+            <View style={styles.barContainer}>
+                <Text style={[styles.barLabel, styles.label]}>Completion Rate</Text>
                 <View style={styles.sliderBar}>
                     <Text style={styles.barText}>{(value*100).toFixed(0)}</Text>
                     <Slider
