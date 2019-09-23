@@ -23,21 +23,43 @@ export default class Accordion extends Component {
 
     showActionSheet = () => {
         ActionSheetIOS.showActionSheetWithOptions(
-            {
-                options: ['Edit List Title', 'Delete List', 'Delete All List Items', 'Cancel'],
-                destructiveButtonIndex: [1, 2],
-                cancelButtonIndex: 3,
-            },
-            (buttonIndex) => {
-                if (buttonIndex === 0) {
-                    this.setState({ isEditListTitleDialogVisible: true });
-                } else if (buttonIndex === 1) {
-                    onListDelete();
-                } else if (buttonIndex === 2) {
-                    onListItemsDelete();
-                }
-            },
+            ...this.getActionSheetOptions()
         );
+    }
+
+    getActionSheetOptions = () => {
+        switch (this.props.options) {
+            case 'deleteItemsOnly':
+                    return [
+                        {
+                            options: ['Delete All List Items', 'Cancel'],
+                            destructiveButtonIndex: 0,
+                            cancelButtonIndex: 1,
+                        },
+                        (buttonIndex) => {
+                            if (buttonIndex === 0) {
+                                onListItemsDelete();
+                            } 
+                        }
+                    ];
+            case 'all':
+                return [
+                    {
+                        options: ['Edit List Title', 'Delete List', 'Delete All List Items', 'Cancel'],
+                        destructiveButtonIndex: [1, 2],
+                        cancelButtonIndex: 3,
+                    },
+                    (buttonIndex) => {
+                        if (buttonIndex === 0) {
+                            this.setState({ isEditListTitleDialogVisible: true });
+                        } else if (buttonIndex === 1) {
+                            onListDelete();
+                        } else if (buttonIndex === 2) {
+                            onListItemsDelete();
+                        }
+                    }
+                ];
+        }
     }
 
     renderEditTitleDialog = () => {
@@ -68,7 +90,7 @@ export default class Accordion extends Component {
                 size={25}
                 color='#43484d'
             />
-            {this.props.hasOptions ?
+            {this.props.options != 'none' ?
                 <Button
                     type="clear"
                     icon={<Icon
@@ -120,7 +142,7 @@ Accordion.propTypes = {
         title: PropTypes.string.isRequired
     })).isRequired,
     title: PropTypes.string.isRequired,
-    hasOptions: PropTypes.bool.isRequired,
+    options: PropTypes.oneOf(['none','deleteItemsOnly', 'all']).isRequired,
     onTitleEdit: PropTypes.func.isRequired,
     onListDelete: PropTypes.func.isRequired,
     onListItemsDelete: PropTypes.func.isRequired,
