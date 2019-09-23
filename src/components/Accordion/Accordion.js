@@ -17,6 +17,7 @@ export default class Accordion extends Component {
         super(props);
         this.state = {
             ...initState,
+            isExpanded: this.props.expanded,
             title: this.props.title
         }
     }
@@ -30,18 +31,18 @@ export default class Accordion extends Component {
     getActionSheetOptions = () => {
         switch (this.props.options) {
             case 'deleteItemsOnly':
-                    return [
-                        {
-                            options: ['Delete All List Items', 'Cancel'],
-                            destructiveButtonIndex: 0,
-                            cancelButtonIndex: 1,
-                        },
-                        (buttonIndex) => {
-                            if (buttonIndex === 0) {
-                                onListItemsDelete();
-                            } 
+                return [
+                    {
+                        options: ['Delete All List Items', 'Cancel'],
+                        destructiveButtonIndex: 0,
+                        cancelButtonIndex: 1,
+                    },
+                    (buttonIndex) => {
+                        if (buttonIndex === 0) {
+                            onListItemsDelete();
                         }
-                    ];
+                    }
+                ];
             case 'all':
                 return [
                     {
@@ -84,11 +85,14 @@ export default class Accordion extends Component {
     }
 
     renderIconButtons = () => {
-        return <View style={styles.buttonContainer}>
+        return <View
+            style={this.props.options != 'none' && styles.buttonContainer}
+        >
             <Icon
                 name={this.state.isExpanded ? "ios-arrow-up" : "ios-arrow-down"}
                 size={25}
                 color='#43484d'
+                style={this.props.options == 'none' && { alignSelf: 'flex-end' }}
             />
             {this.props.options != 'none' ?
                 <Button
@@ -107,11 +111,11 @@ export default class Accordion extends Component {
     }
 
     renderListItems = () => {
-        const { items, navigation } = this.props;
+        const { items, navigation, noItemsText } = this.props;
         return (
-            !items.length ? <Text style={styles.noItemsText}>No Tasks</Text> :
+            !items.length ? <Text style={styles.noItemsText}>{noItemsText}</Text> :
                 items.map((item, key) => {
-                   return <TaskItem task={item} key={key} navigation={navigation}/>
+                    return <TaskItem task={item} key={key} navigation={navigation} />
                 })
         );
     }
@@ -141,11 +145,13 @@ Accordion.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
         title: PropTypes.string.isRequired
     })).isRequired,
+    expanded: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
-    options: PropTypes.oneOf(['none','deleteItemsOnly', 'all']).isRequired,
-    onTitleEdit: PropTypes.func.isRequired,
-    onListDelete: PropTypes.func.isRequired,
-    onListItemsDelete: PropTypes.func.isRequired,
+    options: PropTypes.oneOf(['none', 'deleteItemsOnly', 'all']).isRequired,
+    onTitleEdit: PropTypes.func,
+    onListDelete: PropTypes.func,
+    onListItemsDelete: PropTypes.func,
     listId: PropTypes.string,
+    noItemsText: PropTypes.string.isRequired,
     navigation: PropTypes.any.isRequired
 }
