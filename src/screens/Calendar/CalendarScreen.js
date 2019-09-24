@@ -17,51 +17,42 @@ import { ExpandableCalendar, AgendaList, CalendarProvider } from 'react-native-c
 import { Header } from 'react-native-elements';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../../actions/todoManagement/tasks';
+import {getDateString, get12HourTime} from '../../components/utils/getNZDateTime';
 import styles from '../../components/utils/globalStyles';
 import calendarTheme from './calendarTheme';
 import calStyles from './calendarStyle';
 
+const dates = [];
+const ITEMS = [];
+let marked ={};
 
-
-const today = new Date().toISOString().split('T')[0];
-const fastDate = getPastDate(3);
-const futureDates = getFutureDates(9);
-const dates = [fastDate, today].concat(futureDates);
-
-function getFutureDates(days) {
-    const array = [];
-    for (let index = 1; index <= days; index++) {
-        const date = new Date(Date.now() + (864e5 * index)); // 864e5 == 86400000 == 24*60*60*1000
-        const dateString = date.toISOString().split('T')[0];
-        array.push(dateString);
-    }
-    return array;
-}
-
-function getPastDate(days) {
-    return new Date(Date.now() - (864e5 * days)).toISOString().split('T')[0];
-}
-
-const ITEMS = [
-    { title: dates[0], data: [{ hour: '12am', duration: '1h', title: 'Ashtanga Yoga' }] },
-    { title: dates[1], data: [{ hour: '4pm', duration: '1h', title: 'Pilates ABC' }, { hour: '5pm', duration: '1h', title: 'Vinyasa Yoga' }] },
-    { title: dates[2], data: [{ hour: '1pm', duration: '1h', title: 'Ashtanga Yoga' }, { hour: '2pm', duration: '1h', title: 'Deep Streches' }, { hour: '3pm', duration: '1h', title: 'Private Yoga' }] },
-    { title: dates[3], data: [{ hour: '12am', duration: '1h', title: 'Ashtanga Yoga' }] },
-    { title: dates[4], data: [{}] },
-    { title: dates[5], data: [{ hour: '9pm', duration: '1h', title: 'Pilates Reformer' }, { hour: '10pm', duration: '1h', title: 'Ashtanga' }, { hour: '11pm', duration: '1h', title: 'TRX' }, { hour: '12pm', duration: '1h', title: 'Running Group' }] },
-    { title: dates[6], data: [{ hour: '12am', duration: '1h', title: 'Ashtanga Yoga' }] },
-    { title: dates[7], data: [{}] },
-    { title: dates[8], data: [{ hour: '9pm', duration: '1h', title: 'Pilates Reformer' }, { hour: '10pm', duration: '1h', title: 'Ashtanga' }, { hour: '11pm', duration: '1h', title: 'TRX' }, { hour: '12pm', duration: '1h', title: 'Running Group' }] },
-    { title: dates[9], data: [{ hour: '1pm', duration: '1h', title: 'Ashtanga Yoga' }, { hour: '2pm', duration: '1h', title: 'Deep Streches' }, { hour: '3pm', duration: '1h', title: 'Private Yoga' }] },
-    { title: dates[10], data: [{ hour: '12am', duration: '1h', title: 'Ashtanga Yoga' }] }
-];
 class CalendarScreen extends Component {
     static navigationOptions = () => ({
         title: 'Calendar'
     });
 
-    componentDidUpdate = (prevProps) => {
+    constructor(props) {
+        super(props);
+        const { tasks } = props;
 
+        // get all dates to render in agenda
+        dates.push(...this.getDaysArray(getDateString(new Date(tasks[0].startDate)), getDateString(new Date(tasks[tasks.length -1].startDate))));
+
+        // set the agenda items for each date
+        dates.forEach(date => { 
+            const items = tasks.filter(task => (date == getDateString(new Date(task.startDate))));
+
+            ITEMS.push({title: date, data: items.length ? items:[{}]});
+        });
+
+        // mark dates that have items
+        this.getMarkedDates();
+    }
+
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.tasks === this.props.tasks) {
+            this.getMarkedDates();
+        }
         if (this.props.error) {
             Alert.alert(
                 'User Profile Error',
@@ -72,14 +63,18 @@ class CalendarScreen extends Component {
         }
     }
 
-    onDateChanged = (/* date, updateSource */) => {
-        // console.warn('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
-        // fetch and set data for date + week ahead
-    }
-
-    onMonthChange = (/* month, updateSource */) => {
-        // console.warn('ExpandableCalendarScreen onMonthChange: ', month, updateSource);
-    }
+    /**
+     * Renders the all the dates between two dates. Code 
+     * from from https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates
+     */
+    getDaysArray = (start, end) => {
+        for(var arr=[],dt=new Date(start); dt<=new Date(end); dt.setDate(dt.getDate()+1)){
+            arr.push(new Date(dt));
+        }
+        
+        const dateStrings = arr.map(date =>  getDateString(new Date(date)));
+        return dateStrings;
+    };
 
     buttonPressed() {
         Alert.alert('show more');
@@ -89,6 +84,9 @@ class CalendarScreen extends Component {
         Alert.alert(id);
     }
 
+    /**
+     * Renders for dates that don't have items
+     */
     renderEmptyItem() {
         return (
             <View style={calStyles.emptyItem}>
@@ -97,6 +95,9 @@ class CalendarScreen extends Component {
         );
     }
 
+    /**
+     * Renders the items of each date
+     */
     renderItem = ({ item }) => {
         if (_.isEmpty(item)) {
             return this.renderEmptyItem();
@@ -108,7 +109,7 @@ class CalendarScreen extends Component {
                 style={calStyles.item}
             >
                 <View>
-                    <Text style={calStyles.itemHourText}>{item.hour}</Text>
+                    <Text style={calStyles.itemHourText}>{item.startDate}</Text>
                     <Text style={calStyles.itemDurationText}>{item.duration}</Text>
                 </View>
                 <Text style={calStyles.itemTitleText}>{item.title}</Text>
@@ -119,15 +120,19 @@ class CalendarScreen extends Component {
         );
     }
 
+    /**
+     * Gets all the dates that have items
+     */
     getMarkedDates = () => {
-        const marked = {};
+         const mark = {};
         ITEMS.forEach(item => {
             // only mark dates with data
             if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {
-                marked[item.title] = { marked: true };
+                mark[item.title] = { marked: true };
             }
         });
-        return marked;
+
+        marked = {...marked, ...mark};
     }
 
     render() {
@@ -144,9 +149,7 @@ class CalendarScreen extends Component {
                     <LoadingIndicator />
                 ) : (
                         <CalendarProvider
-                            date={ITEMS[0].title}
-                            onDateChanged={this.onDateChanged}
-                            onMonthChange={this.onMonthChange}
+                            date={getDateString(new Date())}
                             theme={{ todayButtonTextColor: '#007aff' }}
                             showTodayButton
                             disabledOpacity={0.6}
@@ -155,7 +158,7 @@ class CalendarScreen extends Component {
                             <ExpandableCalendar
                                 initialPosition={ExpandableCalendar.positions.OPEN}
                                 firstDay={1}
-                                markedDates={this.getMarkedDates()}
+                                markedDates={marked}
                                 theme={calendarTheme}
                                 calendarStyle={calStyles.calendar}
                                 headerStyle={calStyles.calendar} 
@@ -177,7 +180,7 @@ class CalendarScreen extends Component {
 const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, tasks } }) => ({
     loading: taskOperationLoading,
     error: taskOperationError,
-    tasks: tasks.byId,
+    tasks: Object.values(tasks.byId).sort((task1, task2) => (new Date(task1.startDate) < new Date(task2.startDate))? -1 : (new Date(task1.startDate) === new Date(task2.startDate)) ? ((task1.createdTimestamp.seconds < task2.createdTimestamp.seconds) ? -1 : 1) : 1 ),
     taskIds: tasks.allIds
 });
 
