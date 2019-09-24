@@ -55,6 +55,14 @@ class HomeScreen extends Component {
                                 <Text style={styles.welcomeText}>
                                     {`Welcome ${user.displayName ? user.displayName : ''}`}
                                 </Text>
+                                <Button
+                                type='outline'
+                                title='Create New Task'
+                                onPress={()=>{this.props.navigation.navigate('CreateTask')}}
+                                raised
+                                containerStyle={{margin: 20}}
+                                buttonStyle={{paddingVertical: 15}}
+                            />
                             </View>
                             <View style={styles.accordionListContainer}>
                                 <Accordion
@@ -76,10 +84,6 @@ class HomeScreen extends Component {
                                 />
 
                             </View>
-
-                            <Button title="Edit" onPress={() => {
-                                this.props.navigation.navigate('CreateTask');
-                            }} />
                         </SafeAreaView>
                     </ScrollView>
                 </>
