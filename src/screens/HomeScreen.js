@@ -40,47 +40,49 @@ class HomeScreen extends Component {
             this.props.loading ? (
                 <LoadingIndicator />
             ) :
-                <ScrollView
-                    contentContainerStyle={styles.parentView}
-                >
+                <>
                     <Header
                         centerComponent={{ text: 'Home', style: styles.header }}
                         backgroundColor="white"
                         containerStyle={styles.headerContainer}
                         statusBarProps={{ barStyle: 'dark-content' }}
                     />
-                    <SafeAreaView style={styles.parentViewFlex}>
-                        <View>
-                            <Text style={styles.welcomeText}>
-                                {`Welcome ${user.displayName ? user.displayName : ''}`}
-                            </Text>
-                        </View>
-                        <View style={styles.accordionListContainer}>
-                            <Accordion
-                            title="Tasks Due Today"
-                            expanded={true}
-                            items={this.props.tasksDueToday}
-                            options='none'
-                            noItemsText='No Tasks Due Today'
-                            navigation={this.props.navigation}
-                        />
-                    
-                        <Accordion
-                            title="Tasks Starting Today"
-                            expanded={false}
-                            items={this.props.tasksStartingToday}
-                            options='none'
-                            noItemsText='No Tasks Starting Today'
-                            navigation={this.props.navigation}
-                        />
+                    <ScrollView
+                        contentContainerStyle={styles.parentView}
+                    >
+                        <SafeAreaView style={styles.parentViewFlex}>
+                            <View>
+                                <Text style={styles.welcomeText}>
+                                    {`Welcome ${user.displayName ? user.displayName : ''}`}
+                                </Text>
+                            </View>
+                            <View style={styles.accordionListContainer}>
+                                <Accordion
+                                    title="Tasks Due Today"
+                                    expanded={true}
+                                    items={this.props.tasksDueToday}
+                                    options='none'
+                                    noItemsText='No Tasks Due Today'
+                                    navigation={this.props.navigation}
+                                />
 
-                        </View>
+                                <Accordion
+                                    title="Tasks Starting Today"
+                                    expanded={false}
+                                    items={this.props.tasksStartingToday}
+                                    options='none'
+                                    noItemsText='No Tasks Starting Today'
+                                    navigation={this.props.navigation}
+                                />
 
-                        <Button title="Edit" onPress={() => {
-                            this.props.navigation.navigate('CreateTask');
-                        }} />
-                    </SafeAreaView>
-                </ScrollView>
+                            </View>
+
+                            <Button title="Edit" onPress={() => {
+                                this.props.navigation.navigate('CreateTask');
+                            }} />
+                        </SafeAreaView>
+                    </ScrollView>
+                </>
 
         );
     }

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { SafeAreaView, Text, View, TouchableOpacity, ActionSheetIOS } from 'react-native';
+import { SafeAreaView, Text, View, ScrollView, ActionSheetIOS } from 'react-native';
 import { connect } from 'react-redux';
 import { Button, Input, Header } from 'react-native-elements';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import { addList } from '../actions/todoManagement/taskLists';
@@ -226,11 +225,7 @@ class TaskDetailsScreen extends Component {
             this.props.loading ? (
                 <LoadingIndicator />
             ) :
-
-                <KeyboardAwareScrollView
-                    contentContainerStyle={styles.parentView}
-                    resetScrollToCoords={{ x: 0, y: 0 }}
-                >
+                <>
                     <Header
                         centerComponent={{ text: this.getHeaderTitle(routeName), style: styles.header }}
                         leftComponent={
@@ -254,77 +249,81 @@ class TaskDetailsScreen extends Component {
                         containerStyle={styles.headerContainer}
                         statusBarProps={{ barStyle: 'dark-content' }}
                     />
-                    <SafeAreaView style={styles.centered}>
-                        <Input
-                            label='Title *'
-                            value={this.state.title}
-                            containerStyle={styles.formComponent}
-                            onChangeText={newInput => {
-                                this.setState({ title: newInput })
-                            }}
-                            autoFocus={routeName != 'TaskDetails'}
-                            editable={routeName != 'TaskDetails'}
-                        />
+                    <ScrollView
+                        contentContainerStyle={styles.parentView}
+                    >
 
-                        <Input
-                            label='Location'
-                            value={this.state.location}
-                            containerStyle={styles.formComponent}
-                            onChangeText={newInput => {
-                                this.setState({ location: newInput })
-                            }}
-                            editable={routeName != 'TaskDetails'}
-                        />
+                        <SafeAreaView style={styles.centered}>
+                            <Input
+                                label='Title *'
+                                value={this.state.title}
+                                containerStyle={styles.formComponent}
+                                onChangeText={newInput => {
+                                    this.setState({ title: newInput })
+                                }}
+                                autoFocus={routeName != 'TaskDetails'}
+                                editable={routeName != 'TaskDetails'}
+                            />
 
-                        {this.renderTaskListPicker(routeName == 'TaskDetails')}
+                            <Input
+                                label='Location'
+                                value={this.state.location}
+                                containerStyle={styles.formComponent}
+                                onChangeText={newInput => {
+                                    this.setState({ location: newInput })
+                                }}
+                                editable={routeName != 'TaskDetails'}
+                            />
 
-                        <ProgressBar
-                            disabled={routeName == 'TaskDetails'}
-                            value={this.state.completionRate}
-                            onChangeFunc={(val) => { this.setState({ completionRate: val }) }}
-                        />
+                            {this.renderTaskListPicker(routeName == 'TaskDetails')}
 
-                        {this.renderDatePickers(routeName == 'TaskDetails')}
+                            <ProgressBar
+                                disabled={routeName == 'TaskDetails'}
+                                value={this.state.completionRate}
+                                onChangeFunc={(val) => { this.setState({ completionRate: val }) }}
+                            />
 
-                        <Input
-                            label='Description'
-                            multiline
-                            onChangeText={text => { this.setState({ description: text }) }}
-                            value={this.state.description}
-                            containerStyle={styles.formComponent}
-                            editable={routeName != 'TaskDetails'}
-                        />
-                        <SubtaskContainer
-                            subtasks={this.state.subtasks}
-                            onAdd={(subtask) => {
-                                this.setState({ subtasks: [...this.state.subtasks, subtask] })
-                            }}
-                            onEdit={(index, subtask) => {
-                                this.setState({
-                                    subtasks: this.state.subtasks.map((item, i) => {
-                                        return i == index ? subtask : item
+                            {this.renderDatePickers(routeName == 'TaskDetails')}
+
+                            <Input
+                                label='Description'
+                                multiline
+                                onChangeText={text => { this.setState({ description: text }) }}
+                                value={this.state.description}
+                                containerStyle={styles.formComponent}
+                                editable={routeName != 'TaskDetails'}
+                            />
+                            <SubtaskContainer
+                                subtasks={this.state.subtasks}
+                                onAdd={(subtask) => {
+                                    this.setState({ subtasks: [...this.state.subtasks, subtask] })
+                                }}
+                                onEdit={(index, subtask) => {
+                                    this.setState({
+                                        subtasks: this.state.subtasks.map((item, i) => {
+                                            return i == index ? subtask : item
+                                        })
                                     })
-                                })
-                            }}
-                            onDelete={(index) => {
-                                this.setState({
-                                    subtasks: this.state.subtasks.filter((item, i) => i != index)
-                                })
-                            }}
+                                }}
+                                onDelete={(index) => {
+                                    this.setState({
+                                        subtasks: this.state.subtasks.filter((item, i) => i != index)
+                                    })
+                                }}
 
-                            disabled={routeName == 'TaskDetails'}
-                        />
+                                disabled={routeName == 'TaskDetails'}
+                            />
 
-                        <Button
-                            title="Save"
-                            onPress={() => {
-                                this.setState({ finished: true });
-                                this.props.addTask(this.extractTaskValues());
-                            }}
-                        />
-                    </SafeAreaView>
-                </KeyboardAwareScrollView>
-
+                            <Button
+                                title="Save"
+                                onPress={() => {
+                                    this.setState({ finished: true });
+                                    this.props.addTask(this.extractTaskValues());
+                                }}
+                            />
+                        </SafeAreaView>
+                    </ScrollView>
+                </>
 
         );
     }

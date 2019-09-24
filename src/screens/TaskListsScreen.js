@@ -12,7 +12,7 @@ class TaskListsScreen extends Component {
     static navigationOptions = () => ({
         title: 'Task Lists'
     });
-    
+
     componentDidUpdate = (prevProps) => {
 
         if (this.props.taskError || this.props.listError) {
@@ -31,46 +31,48 @@ class TaskListsScreen extends Component {
             this.props.loading ? (
                 <LoadingIndicator />
             ) :
-                <ScrollView
-                    contentContainerStyle={styles.parentView}
-                >
+                <>
                     <Header
                         centerComponent={{ text: 'Task Lists', style: styles.header }}
                         backgroundColor="white"
                         containerStyle={styles.headerContainer}
                         statusBarProps={{ barStyle: 'dark-content' }}
                     />
-                    <SafeAreaView style={styles.parentViewFlex}>
+                    <ScrollView
+                        contentContainerStyle={styles.parentView}
+                    >
+                        <SafeAreaView style={styles.parentViewFlex}>
 
-                        <Accordion
-                            title="All Tasks"
-                            items={Object.values(this.props.tasks)}
-                            expanded={false}
-                            options='deleteItemsOnly'
-                            onTitleEdit={() => { console.log("title edited") }}
-                            onListDelete={() => { console.log("list deleted") }}
-                            onListItemsDelete={() => { console.log("title edited") }}
-                            noItemsText='No Tasks'
-                            navigation={this.props.navigation}
-                        />
-                        {!listIds.length ? null :
-                            listIds.map((id, key) => {
-                                return <Accordion
-                                    title={listDetails[id].title}
-                                    items={listItems[id]}
-                                    expanded={false}
-                                    options='all'
-                                    onTitleEdit={(listId, list) => { editList(listId, list) }}
-                                    onListDelete={() => { deleteList(listId) }}
-                                    onListItemsDelete={() => { console.log("title edited") }}
-                                    noItemsText='No Tasks'
-                                    navigation={this.props.navigation}
-                                    key={key}
-                                />
-                            })
-                        }
-                    </SafeAreaView>
-                </ScrollView>
+                            <Accordion
+                                title="All Tasks"
+                                items={Object.values(this.props.tasks)}
+                                expanded={false}
+                                options='deleteItemsOnly'
+                                onTitleEdit={() => { console.log("title edited") }}
+                                onListDelete={() => { console.log("list deleted") }}
+                                onListItemsDelete={() => { console.log("title edited") }}
+                                noItemsText='No Tasks'
+                                navigation={this.props.navigation}
+                            />
+                            {!listIds.length ? null :
+                                listIds.map((id, key) => {
+                                    return <Accordion
+                                        title={listDetails[id].title}
+                                        items={listItems[id]}
+                                        expanded={false}
+                                        options='all'
+                                        onTitleEdit={(listId, list) => { editList(listId, list) }}
+                                        onListDelete={() => { deleteList(listId) }}
+                                        onListItemsDelete={() => { console.log("title edited") }}
+                                        noItemsText='No Tasks'
+                                        navigation={this.props.navigation}
+                                        key={key}
+                                    />
+                                })
+                            }
+                        </SafeAreaView>
+                    </ScrollView>
+                </>
         );
     }
 }
