@@ -14,14 +14,14 @@ const calStyles = {
       borderBottomColor: '#e8ecf0', 
       flexDirection: 'row'
     },
-    itemHourText: {
-      color: 'black'
+    itemTopRow: {
+      flexDirection: 'row', 
+      alignItems: 'center'
     },
-    itemDurationText: {
+    itemDueDateText: {
       color: 'grey', 
       fontSize: 12, 
-      marginTop: 4,
-      marginLeft: 4
+      marginTop: 15,
     },
     itemTitleText: {
       color: 'black', 
@@ -31,7 +31,12 @@ const calStyles = {
     },
     itemButtonContainer: {
       flex: 1, 
-      alignItems: 'flex-end'
+      alignItems: 'flex-end',
+      justifyContent: 'center'
+    },
+    infoText: {
+      color: '#007aff',
+      fontSize: 20
     },
     emptyItem: {
       paddingLeft: 20,
