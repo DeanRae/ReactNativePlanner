@@ -125,7 +125,7 @@ export const batchDeleteListIdInTask = (listId) => (dispatch, getState) =>  {
         .get()
         .then(tasks => {
             if (tasks.size == 0) {
-                return 0;              
+                return dispatch(taskBatchModified(taskIds));            
             }
 
             tasks.docs.forEach(task => {

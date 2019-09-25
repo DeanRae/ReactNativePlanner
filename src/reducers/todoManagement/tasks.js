@@ -53,6 +53,9 @@ const tasks = (state = initialState, action) => {
                 }
 
             } else {
+                if (action.tasks.length == 0) {
+                    return {...state, taskOperationLoading: false};
+                }
                 const editedTasks = action.tasks.reduce((object, taskId) => {
                     object[taskId] = { ...state.tasks.byId[taskId], listId: '' };
                     return object
