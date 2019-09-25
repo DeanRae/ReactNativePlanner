@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { updatePassword, updateUserEmail, updateUserName, errorDisplayed, logoutUser } from '../actions/user/auth';

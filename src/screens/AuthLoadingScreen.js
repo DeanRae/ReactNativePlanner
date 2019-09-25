@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Alert } from 'react-native';
 import { connect } from 'react-redux';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { errorDisplayed, restoreSession } from '../actions/user/auth';

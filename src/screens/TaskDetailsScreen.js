@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SafeAreaView, Text, View, ScrollView, ActionSheetIOS } from 'react-native';
+import { SafeAreaView, View, ScrollView, ActionSheetIOS, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { Button, Input, Header } from 'react-native-elements';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -100,7 +100,7 @@ class TaskDetailsScreen extends Component {
         return (
             <View>
                 <Picker
-                    placeholder={{ label: !this.state.listId && isDisabled ? '' :'Select a task list...', value: '' }}
+                    placeholder={{ label: !this.state.listId && isDisabled ? '' : 'Select a task list...', value: '' }}
                     label='List'
                     value={this.state.listId}
                     onChangeFunc={(value) => {
@@ -147,21 +147,26 @@ class TaskDetailsScreen extends Component {
         };
     }
 
-    // renderTaskDetailButtons = () => {
-    //     const {isCompleted} = this.state;
-    //     <View>
-    //         <Button 
-    //             title={isCompleted? 'COMPLETE' : 'DELETE'}
-    //             color={isCompleted? '#4cd964':'#ff3b30'}
-    //             onPress={() => {
-    //                 this.props.editTask({...this.extractTaskValues(), isCompleted: true});
-    //                 this.navigation.goBack();
-    //         } : ()
-    //     }
-    //         />
-    //     </View>
+    renderTaskDetailButtons = () => {
+        const taskId = this.props.navigation.getParam('id', '');
+        const { isCompleted } = this.state;
 
-    // }
+        return (
+            <View>
+                <Button
+                    title={!isCompleted ? 'COMPLETE' : 'DELETE'}
+                    buttonStyle={{backgroundColor:!isCompleted ? '#4cd964' : '#ff3b30'}}
+                    onPress={!isCompleted ? () => {
+                        this.props.editTask(taskId, { isCompleted: true });
+                        this.props.navigation.goBack();
+                    } : () => {
+                        this.props.deleteTask(taskId); this.props.navigation.goBack();
+                    }
+                    }
+                />
+            </View>
+        );
+    }
 
     getRightHeaderButton = (routeName, taskId) => {
         switch (routeName) {
@@ -313,14 +318,16 @@ class TaskDetailsScreen extends Component {
 
                                 disabled={routeName == 'TaskDetails'}
                             />
-
-                            <Button
-                                title="Save"
-                                onPress={() => {
-                                    this.setState({ finished: true });
-                                    this.props.addTask(this.extractTaskValues());
-                                }}
-                            />
+                            {routeName == 'TaskDetails' ?
+                                this.renderTaskDetailButtons() :
+                                <Button
+                                    title="Save"
+                                    onPress={() => {
+                                        this.setState({ finished: true });
+                                        this.props.addTask(this.extractTaskValues());
+                                    }}
+                                />
+                            }
                         </SafeAreaView>
                     </ScrollView>
                 </>
