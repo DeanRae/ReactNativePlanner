@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styles from '../components/utils/globalStyles';
 import Accordion from '../components/Accordion/Accordion';
 import InputDialog from '../components/InputDialog';
+import CreateTaskFab from '../components/CreateTaskFab';
 
 class TaskListsScreen extends Component {
     static navigationOptions = () => ({
@@ -125,6 +126,7 @@ class TaskListsScreen extends Component {
                         </SafeAreaView>
                     </ScrollView>
                     {this.renderNewListInputDialog()}
+                    <CreateTaskFab navigation={this.props.navigation}/>
                 </>
         );
     }
