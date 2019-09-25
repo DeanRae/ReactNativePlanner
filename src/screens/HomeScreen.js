@@ -3,11 +3,12 @@ import { SafeAreaView, View, Alert, Text, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../actions/todoManagement/tasks';
 import { getAllTaskLists } from '../actions/todoManagement/taskLists';
-import { Button, Header } from 'react-native-elements';
+import { Button, Header, Icon } from 'react-native-elements';
 import styles from '../components/utils/globalStyles';
 import LoadingIndicator from '../components/LoadingIndicator';
 import { getDateString } from '../components/utils/getNZDateTime';
 import Accordion from '../components/Accordion/Accordion';
+import CreateTaskFab from '../components/CreateTaskFab';
 class HomeScreen extends Component {
     static navigationOptions = () => ({
         title: 'Home',
@@ -56,13 +57,13 @@ class HomeScreen extends Component {
                                     {`Welcome ${user.displayName ? user.displayName : ''}`}
                                 </Text>
                                 <Button
-                                type='outline'
-                                title='Create New Task'
-                                onPress={()=>{this.props.navigation.navigate('CreateTask')}}
-                                raised
-                                containerStyle={{margin: 20}}
-                                buttonStyle={{paddingVertical: 15}}
-                            />
+                                    type='outline'
+                                    title='Create New Task'
+                                    onPress={() => { this.props.navigation.navigate('CreateTask') }}
+                                    raised
+                                    containerStyle={{ margin: 20 }}
+                                    buttonStyle={{ paddingVertical: 15 }}
+                                />
                             </View>
                             <View style={styles.accordionListContainer}>
                                 <Accordion
@@ -86,6 +87,7 @@ class HomeScreen extends Component {
                             </View>
                         </SafeAreaView>
                     </ScrollView>
+                    <CreateTaskFab navigation={this.props.navigation}/>
                 </>
 
         );
