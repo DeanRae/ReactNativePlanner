@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, SafeAreaView, ScrollView } from 'react-native';
+import { View, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { Header, Button } from 'react-native-elements';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -56,6 +56,12 @@ class TaskListsScreen extends Component {
         />
     }
 
+    getTaskIdsInList = (listId) => {
+        return this.props.listItems[listId].map((task) => {
+            return task.id;
+        });
+    }
+
     render() {
         const { listItems, listDetails, listIds, editList, deleteList, batchDeleteTasks, listsLoading, tasksLoading } = this.props
         return (
@@ -108,7 +114,7 @@ class TaskListsScreen extends Component {
                                         options='all'
                                         onTitleEdit={(listId, list) => { editList(listId, list) }}
                                         onListDelete={() => { deleteList(id) }}
-                                        onListItemsDelete={() => { batchDeleteTasks(id) }}
+                                        onListItemsDelete={() => { batchDeleteTasks(id, this.getTaskIdsInList(id)) }}
                                         noItemsText='No Tasks'
                                         navigation={this.props.navigation}
                                         listId={id}
