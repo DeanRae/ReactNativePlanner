@@ -5,7 +5,6 @@ const initialState = {
     tasks: {
         byId: {},
         allIds: [],
-        subtasks: {}
     },
     taskOperationLoading: false,
     taskOperationError: null
@@ -16,8 +15,8 @@ const tasks = (state = initialState, action) => {
         case types.TASKS_FETCHED:
             return { ...state, tasks: action.tasks, taskOperationLoading: false };
         case types.TASK_DELETION_SUCCESS:
-            if (!action.task && !action.tasks) {
-                return state;
+            if (!action.taskId && !action.tasks) {
+                return {...state, taskOperationLoading: false };
             }
 
             const newById = Object.entries(state.tasks.byId).reduce((object, entry) => {
@@ -36,7 +35,7 @@ const tasks = (state = initialState, action) => {
                 return object
             }, {});
 
-            const newAllIds = action.tasks ? state.tasks.allIds.filter(task => task != action.taskId) : state.tasks.allIds.filter(task => !_.includes(action.tasks, entry[0]));
+            const newAllIds = action.tasks ? state.tasks.allIds.filter(task => task != action.taskId) : state.tasks.allIds.filter(task => !_.includes(action.tasks, task));
 
             return { ...state, tasks: { byId: newById, allIds: newAllIds }, taskOperationLoading: false };
         case types.TASK_OPERATION_ERROR:
