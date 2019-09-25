@@ -11,13 +11,14 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { ExpandableCalendar, AgendaList, CalendarProvider } from 'react-native-calendars';
-import { Header } from 'react-native-elements';
+import { Header, Button } from 'react-native-elements';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { getAllTasks, addTask, deleteTask, editTask, errorDisplayed } from '../../actions/todoManagement/tasks';
 import { getDateString, get12HrTime, getFriendlyDateString } from '../../components/utils/getNZDateTime';
 import styles from '../../components/utils/globalStyles';
 import calendarTheme from './calendarTheme';
 import calStyles from './calendarStyle';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 let dates = [];
 let ITEMS = [];
@@ -69,7 +70,7 @@ class CalendarScreen extends Component {
             return;
         }
 
-       dates = this.getDaysArray(getDateString(new Date(tasks[0].startDate)), getDateString(new Date(tasks[tasks.length - 1].startDate)));
+        dates = this.getDaysArray(getDateString(new Date(tasks[0].startDate)), getDateString(new Date(tasks[tasks.length - 1].startDate)));
     }
 
     /**
@@ -159,7 +160,7 @@ class CalendarScreen extends Component {
         if (!ITEMS.length) {
             return;
         }
-        
+
         const mark = {};
         ITEMS.forEach(item => {
             // only mark dates with data
@@ -179,6 +180,20 @@ class CalendarScreen extends Component {
                     backgroundColor="white"
                     containerStyle={styles.headerContainer}
                     statusBarProps={{ barStyle: 'dark-content' }}
+                    rightComponent={
+                        <Button
+                            type='clear'
+                            icon={
+                                <Icon
+                                    name='ios-add'
+                                    size={35}
+                                    color='#007aff'
+                                />
+                            }
+                            containerStyle={{marginRight: 3}}
+                            onPress={()=>{this.props.navigation.navigate("CreateTask");}}
+                        />
+                    }
                 />
 
                 {this.props.loading ? (
