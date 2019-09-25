@@ -17,8 +17,8 @@ export default class CreateTaskFab extends Component {
             raised
             containerStyle={{
                 position: 'absolute',
-                bottom: 25,
-                right: 23,
+                bottom: 20,
+                right: 20,
             }}
             onPress={()=>{this.props.navigation.navigate('CreateTask');}}
         />);
