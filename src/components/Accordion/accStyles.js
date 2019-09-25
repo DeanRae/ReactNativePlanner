@@ -12,7 +12,15 @@ export default styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     expandedColor: {
-        backgroundColor: '#f0f4f7', 
+        backgroundColor: '#cddae4', 
+        color: '#79838a'
+    },
+    subListNotExpanded: {
+        backgroundColor:'#f0f4f7',
+        color: '#79838a'
+    },
+    subListExpanded: {
+        backgroundColor: '#d9d9d9',
         color: '#79838a'
     },
     label: {

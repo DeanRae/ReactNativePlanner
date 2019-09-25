@@ -73,6 +73,7 @@ class HomeScreen extends Component {
                                     options='none'
                                     noItemsText='No Tasks Due Today'
                                     navigation={this.props.navigation}
+                                    hasSubList={false}
                                 />
 
                                 <Accordion
@@ -82,6 +83,7 @@ class HomeScreen extends Component {
                                     options='none'
                                     noItemsText='No Tasks Starting Today'
                                     navigation={this.props.navigation}
+                                    hasSubList={false}
                                 />
 
                             </View>

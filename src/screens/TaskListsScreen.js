@@ -19,7 +19,7 @@ class TaskListsScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isDialogVisible: false, 
+            isDialogVisible: false,
             newListValue: ''
         }
     }
@@ -66,7 +66,7 @@ class TaskListsScreen extends Component {
     render() {
         const { listItems, listDetails, listIds, editList, deleteList, batchDeleteTasks, listsLoading, tasksLoading } = this.props
         return (
-            listsLoading || tasksLoading? (
+            listsLoading || tasksLoading ? (
                 <LoadingIndicator />
             ) :
                 <>
@@ -85,8 +85,8 @@ class TaskListsScreen extends Component {
                                         color='#007aff'
                                     />
                                 }
-                                containerStyle={{marginRight: 3}}
-                                onPress={()=>{this.setState({isDialogVisible: true})}}
+                                containerStyle={{ marginRight: 3 }}
+                                onPress={() => { this.setState({ isDialogVisible: true }) }}
                             />
                         }
                     />
@@ -105,6 +105,7 @@ class TaskListsScreen extends Component {
                                 onListItemsDelete={() => { console.log("title edited") }}
                                 noItemsText='No Tasks'
                                 navigation={this.props.navigation}
+                                hasSubList={true}
                             />
                             {!listIds.length ? null :
                                 listIds.map((id, key) => {
@@ -120,13 +121,14 @@ class TaskListsScreen extends Component {
                                         navigation={this.props.navigation}
                                         listId={id}
                                         key={key}
+                                        hasSubList={true}
                                     />
                                 })
                             }
                         </SafeAreaView>
                     </ScrollView>
                     {this.renderNewListInputDialog()}
-                    <CreateTaskFab navigation={this.props.navigation}/>
+                    <CreateTaskFab navigation={this.props.navigation} />
                 </>
         );
     }

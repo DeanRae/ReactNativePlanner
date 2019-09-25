@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, ActionSheetIOS, FlatList } from 'react-native';
+import React, { PureComponent } from 'react';
+import { View, Text, TouchableOpacity, ActionSheetIOS } from 'react-native';
 import { Button, CheckBox } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
@@ -9,10 +9,12 @@ import TaskItem from '../TaskItem/TaskItem';
 
 const initState = {
     isExpanded: false,
+    isCompletedExpanded: false,
+    isUncompletedExpanded: false,
     isEditListTitleDialogVisible: false,
     title: ''
 }
-export default class Accordion extends Component {
+export default class Accordion extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -29,6 +31,7 @@ export default class Accordion extends Component {
     }
 
     getActionSheetOptions = () => {
+        const { onListDelete, onListItemsDelete } = this.props;
         switch (this.props.options) {
             case 'deleteItemsOnly':
                 return [
@@ -64,14 +67,14 @@ export default class Accordion extends Component {
     }
 
     renderEditTitleDialog = () => {
-        if (this.props.hasOptions) {
+        if (this.props.options != 'none') {
             return <InputDialog
                 title='Edit List Title'
                 inputs={{ title: this.state.title }}
                 isVisible={this.state.isEditListTitleDialogVisible}
                 onSaveFunc={() => {
                     this.props.onTitleEdit(this.props.listId, { title: this.state.title });
-                    this.setState({ isEditTaskDialogVisible: false });
+                    this.setState({ isEditListTitleDialogVisible: false });
                 }}
                 onChangeFunc={(field, newInput) => {
                     this.setState({ title: newInput })
@@ -81,20 +84,20 @@ export default class Accordion extends Component {
                 }}
             />
         }
-
     }
 
-    renderIconButtons = () => {
+    renderIconButtons = (isSubList, isExpanded) => {
+        const iconOnly = this.props.options == 'none' || isSubList;
         return <View
-            style={this.props.options != 'none' && styles.buttonContainer}
+            style={!iconOnly && styles.buttonContainer}
         >
             <Icon
-                name={this.state.isExpanded ? "ios-arrow-up" : "ios-arrow-down"}
+                name={isExpanded ? "ios-arrow-up" : "ios-arrow-down"}
                 size={25}
                 color='#43484d'
-                style={this.props.options == 'none' && { alignSelf: 'flex-end' }}
+                style={iconOnly && { alignSelf: 'flex-end' }}
             />
-            {this.props.options != 'none' ?
+            {!iconOnly && !isSubList ?
                 <Button
                     type="clear"
                     icon={<Icon
@@ -110,8 +113,8 @@ export default class Accordion extends Component {
         </View>
     }
 
-    renderListItems = () => {
-        const { items, navigation, noItemsText } = this.props;
+    renderListItems = (items) => {
+        const { navigation, noItemsText } = this.props;
         return (
             !items.length ? <Text style={styles.noItemsText}>{noItemsText}</Text> :
                 items.map((item, key) => {
@@ -120,8 +123,7 @@ export default class Accordion extends Component {
         );
     }
 
-    render() {
-        const { title, hasOptions, listId, onListDelete, onListItemsDelete, onTitleEdit } = this.props;
+    renderNonSubListAccordion = () => {
         const { isExpanded } = this.state;
         return (
             <>
@@ -129,29 +131,84 @@ export default class Accordion extends Component {
                     style={!isExpanded ? styles.accordionContainer : [styles.accordionContainer, styles.expandedColor]}
                     onPress={() => { this.setState({ isExpanded: !isExpanded }) }}
                 >
-                    <Text style={styles.label}>{title}</Text>
-                    {this.renderIconButtons()}
+                    <Text style={styles.label}>{this.props.title}</Text>
+                    {this.renderIconButtons(false, this.state.isExpanded)}
                 </TouchableOpacity>
-                {isExpanded ? this.renderListItems() : null}
+                {isExpanded ? this.renderListItems(this.props.items) : null}
+            </>
+        )
+    }
+
+    renderSubLists = () => {
+        const uncompletedItems = this.props.items.filter(task => !task.isCompleted);
+        const completedItems = this.props.items.filter(task => task.isCompleted);
+        const { isCompletedExpanded, isUncompletedExpanded } = this.state;
+        return (
+            <>
+                {/* render uncompleted tasks sublist */}
+                <TouchableOpacity
+                    style={!isUncompletedExpanded ? [styles.accordionContainer, styles.subListNotExpanded] : [styles.accordionContainer, styles.subListExpanded]}
+                    onPress={() => { this.setState({ isUncompletedExpanded: !isUncompletedExpanded }) }}
+                >
+                    <Text style={styles.label}>Uncompleted Tasks</Text>
+                    {this.renderIconButtons(true, isUncompletedExpanded)}
+                </TouchableOpacity>
+                {isUncompletedExpanded ? this.renderListItems(uncompletedItems) : null}
+
+                {/* render completed tasks sublist */}
+                <TouchableOpacity
+                    style={!isCompletedExpanded ? [styles.accordionContainer, styles.subListNotExpanded] : [styles.accordionContainer, styles.subListExpanded]}
+                    onPress={() => { this.setState({ isCompletedExpanded: !isCompletedExpanded }) }}
+                >
+                    <Text style={styles.label}>Completed Tasks</Text>
+                    {this.renderIconButtons(true, isCompletedExpanded)}
+                </TouchableOpacity>
+                {isCompletedExpanded ? this.renderListItems(completedItems) : null}
+            </>
+        );
+    }
+
+    render() {
+        const { title, hasSubList } = this.props;
+        const { isExpanded } = this.state;
+
+        return (
+            <View>
+                {!hasSubList ? this.renderNonSubListAccordion() :
+                    <>
+                        <TouchableOpacity
+                            style={!isExpanded ? styles.accordionContainer : [styles.accordionContainer, styles.expandedColor]}
+                            onPress={() => { this.setState({ isExpanded: !isExpanded }) }}
+                        >
+                            <Text style={styles.label}>{title}</Text>
+                            {this.renderIconButtons(false, isExpanded)}
+                        </TouchableOpacity>
+                        {isExpanded ? this.renderSubLists() : null}
+                </>
+
+                }
                 <>
                     {this.renderEditTitleDialog()}
                 </>
-            </>
+            </View>
         );
     }
 }
 
 Accordion.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
-        title: PropTypes.string.isRequired
-    })).isRequired,
+        title: PropTypes.string.isRequired,
+    })),
     expanded: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
     options: PropTypes.oneOf(['none', 'deleteItemsOnly', 'all']).isRequired,
     onTitleEdit: PropTypes.func,
     onListDelete: PropTypes.func,
     onListItemsDelete: PropTypes.func,
+    onCompletedItemsDelete: PropTypes.func,
+    onUncompletedItemsDelete: PropTypes.func,
     listId: PropTypes.string,
-    noItemsText: PropTypes.string.isRequired,
-    navigation: PropTypes.any.isRequired
+    noItemsText: PropTypes.string,
+    navigation: PropTypes.any.isRequired,
+    hasSubList: PropTypes.bool.isRequired
 }
