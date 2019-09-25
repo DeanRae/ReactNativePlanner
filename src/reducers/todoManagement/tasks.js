@@ -1,4 +1,5 @@
 import * as types from '../../actions/todoManagement/actionTypes';
+import _ from 'lodash';
 
 const initialState = {
     tasks: {
@@ -15,14 +16,29 @@ const tasks = (state = initialState, action) => {
         case types.TASKS_FETCHED:
             return { ...state, tasks: action.tasks, taskOperationLoading: false };
         case types.TASK_DELETION_SUCCESS:
-            const newById = Object.keys(state.tasks.byId).reduce((object, key) => {
-                if (key !== action.taskId) {
-                    object[key] = state.tasks.byId[key]
+            if (!action.task && !action.tasks) {
+                return state;
+            } 
+
+            const newById = Object.entries(state.tasks.byId).reduce((object, entry) => {
+                if (action.taskId) {
+                    // for a singular task 
+                    if (entry[0] != action.taskId) {
+                        object[entry[0]] = entry[1];
+                    }
+                } else {
+                    // for more than one task (i.e. batch delete)
+                    if (!_.includes(action.tasks, entry[0])){
+                        object[entry[0]] = entry[1];
+                    }
                 }
+               
                 return object
             }, {});
 
-            return { ...state, tasks: { byId: newById, allIds: state.tasks.allIds.filter(task => task != action.taskId) }, taskOperationLoading: false };
+            const newAllIds = action.tasks ? state.tasks.allIds.filter(task => task != action.taskId) : state.tasks.allIds.filter(task => !_.includes(action.tasks, entry[0]));
+
+            return { ...state, tasks: { byId: newById, allIds: newAllIds }, taskOperationLoading: false };
         case types.TASK_OPERATION_ERROR:
             return { ...state, taskOperationError: action.error, taskOperationLoading: false };
         case types.TASK_MODIFIED:

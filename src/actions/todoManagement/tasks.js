@@ -1,12 +1,12 @@
-import { firestore, serverTimestamp } from "../../services/firebase"; 
+import { firestore, serverTimestamp } from "../../services/firebase";
 import * as types from './actionTypes';
 
 export const getAllTasks = () => (dispatch, getState) => {
     dispatch(taskOperationLoading());
 
-    const {auth} = getState();
-    const user = {...auth.user};
-    
+    const { auth } = getState();
+    const user = { ...auth.user };
+
     let newTasks = {
         byId: {},
         allIds: []
@@ -41,7 +41,7 @@ export const getAllTasks = () => (dispatch, getState) => {
             dispatch(tasksFetched(newTasks));
 
         })
-        .catch( error => {           
+        .catch(error => {
             dispatch(taskOperationError(error.message));
         });
 }
@@ -49,8 +49,8 @@ export const getAllTasks = () => (dispatch, getState) => {
 export const addTask = (task) => (dispatch, getState) => {
     dispatch(taskOperationLoading());
 
-    const {auth} = getState();
-    const user = {...auth.user};
+    const { auth } = getState();
+    const user = { ...auth.user };
     const timestamp = serverTimestamp();
 
     let newTask = {};
@@ -58,13 +58,13 @@ export const addTask = (task) => (dispatch, getState) => {
     const newTaskRef = firestore()
         .collection(`/userProfile/${user.uid}/tasks`).doc();
 
-        newTaskRef
-        .set({...task, createdTimestamp: timestamp, id: newTaskRef.id})
+    newTaskRef
+        .set({ ...task, createdTimestamp: timestamp, id: newTaskRef.id })
         .then(() => {
-            newTask = {...task, id: newTaskRef.id, createdTimestamp: timestamp};
+            newTask = { ...task, id: newTaskRef.id, createdTimestamp: timestamp };
             dispatch(taskAdded(newTask));
         })
-        .catch( error => {            
+        .catch(error => {
             dispatch(taskOperationError(error.message));
         });
 }
@@ -72,8 +72,8 @@ export const addTask = (task) => (dispatch, getState) => {
 export const editTask = (taskId, editedContents) => (dispatch, getState) => {
     dispatch(taskOperationLoading());
 
-    const {auth} = getState();
-    const user = {...auth.user};
+    const { auth } = getState();
+    const user = { ...auth.user };
     const timestamp = serverTimestamp();
 
     firestore()
@@ -84,9 +84,9 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
             updatedTimestamp: timestamp
         })
         .then(() => {
-            dispatch(taskModified({...editedContents, updatedTimestamp: timestamp, id: taskId}));
+            dispatch(taskModified({ ...editedContents, updatedTimestamp: timestamp, id: taskId }));
         })
-        .catch( error => {          
+        .catch(error => {
             dispatch(taskOperationError(error.message));
         });
 }
@@ -94,8 +94,8 @@ export const editTask = (taskId, editedContents) => (dispatch, getState) => {
 export const deleteTask = (taskId) => (dispatch, getState) => {
     dispatch(taskOperationLoading());
 
-    const {auth} = getState();
-    const user = {...auth.user};
+    const { auth } = getState();
+    const user = { ...auth.user };
 
     firestore()
         .collection(`/userProfile/${user.uid}/tasks`)
@@ -104,15 +104,74 @@ export const deleteTask = (taskId) => (dispatch, getState) => {
         .then(() => {
             dispatch(taskDeleted(taskId));
         })
-        .catch( error => {          
+        .catch(error => {
             dispatch(taskOperationError(error.message));
         });
 }
+
+
+
+export const batchDeleteTasks = (listId, taskIds, isCompleted) => (dispatch, getState) => {
+    dispatch(taskOperationLoading());
+
+    const { auth } = getState();
+    const user = { ...auth.user };
+
+    let ref = null;
+    
+    if (listId && isCompleted != null) {
+        // delete all tasks from a list depending on completion status
+        ref = firestore()
+        .collection(`/userProfile/${user.uid}/tasks`).where('listId', '==', listId).where('isCompleted', '==', isCompleted);
+    } else if (listId && isCompleted == null) {
+        // delete all tasks from a list regardless of whether it is completed or not
+        ref = firestore()
+        .collection(`/userProfile/${user.uid}/tasks`).where('listId', '==', listId); 
+    } else {
+        // delete all tasks
+        ref = firestore()
+            .collection(`/userProfile/${user.uid}/tasks`);
+    }
+
+    const batch = firestore().batch();
+
+    ref
+        .get()
+        .then(tasks => {
+            console.log("at first then");
+            if (tasks.size == 0) {
+                console.log("checking task size");
+                return 0;
+                
+            }
+
+            console.log("going to loop");
+            tasks.docs.forEach(task => {
+                batch.delete(task.ref);
+            });
+
+            console.log("returning commoit");
+            return batch.commit().then(() => {
+                console.log("taskIds", taskIds);
+                dispatch(taskBatchDeleted(taskIds));
+               
+            });
+            
+        })
+        .catch(error => {
+            dispatch(taskOperationError(error.message));
+        });
+}
+
 
 export const errorDisplayed = () => dispatch => {
     dispatch(errorAcknowledged());
 }
 
+const taskBatchDeleted = tasks => ({
+    type: types.TASK_DELETION_SUCCESS,
+    tasks
+});
 
 const tasksFetched = tasks => ({
     type: types.TASKS_FETCHED,
