@@ -99,8 +99,8 @@ const mapStateToProps = ({ tasks: { taskOperationLoading, taskOperationError, ta
     loading: taskOperationLoading,
     error: taskOperationError,
     tasks: tasks.byId,
-    tasksDueToday: Object.values(tasks.byId).filter(task => getDateString(new Date()) == getDateString(new Date(task.endDate))),
-    tasksStartingToday: Object.values(tasks.byId).filter(task => getDateString(new Date()) == getDateString(new Date(task.startDate))),
+    tasksDueToday: Object.values(tasks.byId).filter(task => getDateString(new Date()) == getDateString(new Date(task.endDate)) && !task.isCompleted),
+    tasksStartingToday: Object.values(tasks.byId).filter(task => getDateString(new Date()) == getDateString(new Date(task.startDate)) && !task.isCompleted),
     taskIds: tasks.allIds,
     user
 });
