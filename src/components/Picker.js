@@ -69,7 +69,7 @@ export default class Picker extends Component {
                     }
                     value={value}
                     style={styles}
-                    Icon={() => { return <Icon name='ios-arrow-down' color='#43484d' size={24} /> }}
+                    Icon={() => { return !disabled ? <Icon name='ios-arrow-down' color='#43484d' size={24} /> : null}}
                     disabled={disabled}
                 />
             </View>

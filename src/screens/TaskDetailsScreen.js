@@ -100,7 +100,7 @@ class TaskDetailsScreen extends Component {
         return (
             <View>
                 <Picker
-                    placeholder={{ label: 'Select a task list...', value: '' }}
+                    placeholder={{ label: !this.state.listId && isDisabled ? '' :'Select a task list...', value: '' }}
                     label='List'
                     value={this.state.listId}
                     onChangeFunc={(value) => {
