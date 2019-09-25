@@ -18,7 +18,7 @@ const tasks = (state = initialState, action) => {
         case types.TASK_DELETION_SUCCESS:
             if (!action.task && !action.tasks) {
                 return state;
-            } 
+            }
 
             const newById = Object.entries(state.tasks.byId).reduce((object, entry) => {
                 if (action.taskId) {
@@ -28,11 +28,11 @@ const tasks = (state = initialState, action) => {
                     }
                 } else {
                     // for more than one task (i.e. batch delete)
-                    if (!_.includes(action.tasks, entry[0])){
+                    if (!_.includes(action.tasks, entry[0])) {
                         object[entry[0]] = entry[1];
                     }
                 }
-               
+
                 return object
             }, {});
 
@@ -42,15 +42,31 @@ const tasks = (state = initialState, action) => {
         case types.TASK_OPERATION_ERROR:
             return { ...state, taskOperationError: action.error, taskOperationLoading: false };
         case types.TASK_MODIFIED:
-            // add nethod to deal with subtasks for this and deleted.
-            const editedTask = {...state.tasks.byId[action.task.id]};
-            return {
-                ...state,
-                tasks: {
-                    ...state.tasks,
-                    byId: { ...state.tasks.byId, [action.task.id]: {...editedTask, ...action.task} }
-                }, 
-                taskOperationLoading: false
+            if (action.task) {
+                const editedTask = { ...state.tasks.byId[action.task.id] };
+                return {
+                    ...state,
+                    tasks: {
+                        ...state.tasks,
+                        byId: { ...state.tasks.byId, [action.task.id]: { ...editedTask, ...action.task } }
+                    },
+                    taskOperationLoading: false
+                }
+
+            } else {
+                const editedTasks = action.tasks.reduce((object, taskId) => {
+                    object[taskId] = { ...state.tasks.byId[taskId], listId: '' };
+                    return object
+                }, {});
+
+                return {
+                    ...state,
+                    tasks: {
+                        ...state.tasks,
+                        byId: { ...state.tasks.byId, ...editedTasks }
+                    },
+                    taskOperationLoading: false
+                }
             }
         case types.TASK_ADDED:
             return {

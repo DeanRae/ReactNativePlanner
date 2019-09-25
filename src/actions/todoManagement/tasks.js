@@ -109,7 +109,39 @@ export const deleteTask = (taskId) => (dispatch, getState) => {
         });
 }
 
+export const batchDeleteListIdInTask = (listId) => (dispatch, getState) =>  {
+    dispatch(taskOperationLoading());
+    // get all tasks that match this listId,
+    const { auth } = getState();
+    const user = { ...auth.user };
+    const ref = firestore()
+    .collection(`/userProfile/${user.uid}/tasks`).where('listId', '==', listId); 
+    // update field of listId to empty 
+    const batch = firestore().batch();
+    const taskIds = [];
 
+    // update list ids to null
+    ref
+        .get()
+        .then(tasks => {
+            if (tasks.size == 0) {
+                return 0;              
+            }
+
+            tasks.docs.forEach(task => {
+                batch.update(task.ref, {listId: ''});
+                taskIds.push(task.id);
+            });
+
+            return batch.commit().then(() => {
+                dispatch(taskBatchModified(taskIds));        
+            });
+            
+        })
+        .catch(error => {
+            dispatch(taskOperationError(error.message));
+        });
+}
 
 export const batchDeleteTasks = (listId, taskIds, isCompleted) => (dispatch, getState) => {
     dispatch(taskOperationLoading());
@@ -138,21 +170,15 @@ export const batchDeleteTasks = (listId, taskIds, isCompleted) => (dispatch, get
     ref
         .get()
         .then(tasks => {
-            console.log("at first then");
             if (tasks.size == 0) {
-                console.log("checking task size");
-                return 0;
-                
+                return 0;              
             }
 
-            console.log("going to loop");
             tasks.docs.forEach(task => {
                 batch.delete(task.ref);
             });
 
-            console.log("returning commoit");
             return batch.commit().then(() => {
-                console.log("taskIds", taskIds);
                 dispatch(taskBatchDeleted(taskIds));
                
             });
@@ -172,6 +198,12 @@ const taskBatchDeleted = tasks => ({
     type: types.TASK_DELETION_SUCCESS,
     tasks
 });
+
+const taskBatchModified = tasks => ({
+    type: types.TASK_MODIFIED,
+    tasks
+});
+
 
 const tasksFetched = tasks => ({
     type: types.TASKS_FETCHED,

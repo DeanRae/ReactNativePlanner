@@ -1,4 +1,5 @@
 import { firestore, serverTimestamp } from "../../services/firebase"; 
+import { batchDeleteListIdInTask } from "./tasks";
 import * as types from './actionTypes';
 
 export const getAllTaskLists = () => (dispatch, getState) => {
@@ -93,7 +94,7 @@ export const deleteList = (listId) => (dispatch, getState) => {
         .delete()
         .then(() => {
             dispatch(listDeleted(listId));
-            
+            dispatch(batchDeleteListIdInTask(listId));
         })
         .catch( error => {           
             dispatch(listOperationError(error.message));
