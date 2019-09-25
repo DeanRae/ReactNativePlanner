@@ -74,7 +74,7 @@ export const editList = (listId, editedContents) => (dispatch, getState) => {
             updatedTimestamp: timestamp
         })
         .then(() => {
-            dispatch(listModified({...editedContents, updatedTimestamp: timestamp}));
+            dispatch(listModified({...editedContents, updatedTimestamp: timestamp, id: listId}));
         })
         .catch( error => {           
             dispatch(listOperationError(error.message));
@@ -92,7 +92,8 @@ export const deleteList = (listId) => (dispatch, getState) => {
         .doc(listId)
         .delete()
         .then(() => {
-            dispatch(listDeleted(taskId));
+            dispatch(listDeleted(listId));
+            
         })
         .catch( error => {           
             dispatch(listOperationError(error.message));
